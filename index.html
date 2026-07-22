@@ -14,16 +14,18 @@
     h1 { margin:0; color:var(--purple); font-size:clamp(2.5rem,8vw,5.2rem); line-height:1; text-shadow:3px 3px #ffd448; }
     h2 { margin:.4rem 0 1rem; font-size:clamp(1.5rem,4vw,2.2rem); }
     .intro { margin:.8rem auto 1.6rem; font-size:clamp(1rem,2.5vw,1.3rem); font-weight:700; }
-    .setup-grid { display:grid; grid-template-columns:1fr 1.5fr; gap:1.5rem; text-align:left; }
+    .setup-grid { display:grid; gap:1.5rem; text-align:left; }
     fieldset { min-width:0; margin:0; padding:1rem; border:3px solid #d8c9ee; border-radius:20px; }
     legend { padding:0 .45rem; font-size:1.15rem; font-weight:900; }
     .choices { display:grid; gap:.65rem; }
     .player-choices { grid-template-columns:repeat(4,1fr); }
-    .age-choices { grid-template-columns:repeat(2,1fr); }
+    .player-ages { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; }
+    .player-age { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:.7rem; font-weight:850; }
+    .player-age select { width:100%; min-height:48px; padding:.55rem; border:3px solid var(--ink); border-radius:12px; color:var(--ink); background:#fff; font-family:inherit; font-size:1rem; font-weight:800; }
     .choice input { position:absolute; opacity:0; pointer-events:none; }
     .choice span { display:grid; place-items:center; min-height:54px; padding:.55rem; border:3px solid var(--ink); border-radius:14px; background:#fff; font-weight:850; cursor:pointer; box-shadow:0 4px 0 var(--ink); }
     .choice input:checked + span { color:#fff; background:var(--purple); transform:translateY(3px); box-shadow:0 1px 0 var(--ink); }
-    .choice input:focus-visible + span, button:focus-visible { outline:5px solid #ffbd00; outline-offset:3px; }
+    .choice input:focus-visible + span, .player-age select:focus-visible, button:focus-visible { outline:5px solid #ffbd00; outline-offset:3px; }
     button { border:3px solid var(--ink); border-radius:18px; color:#fff; background:var(--purple); font:850 clamp(1.15rem,3vw,1.55rem)/1.1 inherit; cursor:pointer; box-shadow:0 6px 0 var(--ink); touch-action:manipulation; }
     button:active { transform:translateY(5px); box-shadow:0 1px 0 var(--ink); }
     .start { width:min(100%,440px); min-height:68px; margin:1.5rem auto 0; background:#087a4d; }
@@ -38,8 +40,8 @@
     .message { min-height:1.5em; margin:.6rem 0 0; font-weight:800; color:#08704a; }
     .hidden { display:none; }
     footer { margin-top:1.5rem; font-weight:750; }
-    @media (max-width:700px) { .setup-grid{grid-template-columns:1fr}.age-choices{grid-template-columns:1fr 1fr}.panel{border-radius:22px}.game-head{align-items:flex-start} }
-    @media (max-width:390px) { .player-choices{grid-template-columns:repeat(3,1fr)}.age-choices{grid-template-columns:1fr} }
+    @media (max-width:700px) { .player-ages{grid-template-columns:1fr}.panel{border-radius:22px}.game-head{align-items:flex-start} }
+    @media (max-width:390px) { .player-choices{grid-template-columns:repeat(3,1fr)} }
     @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } }
   </style>
 </head>
@@ -47,7 +49,7 @@
   <main>
     <section class="panel" id="setup" aria-labelledby="title">
       <h1 id="title">Rita och gissa!</h1>
-      <p class="intro">Välj lagets storlek och en åldersgrupp. Här får alla vara med!</p>
+      <p class="intro">Välj hur många som spelar och en egen ålder för varje spelare. Uppdragen är enkla, tydliga och roliga att rita!</p>
       <div class="setup-grid">
         <fieldset>
           <legend>Hur många spelar?</legend>
@@ -62,14 +64,8 @@
           </div>
         </fieldset>
         <fieldset>
-          <legend>Vilken ålder passar bäst?</legend>
-          <div class="choices age-choices">
-            <label class="choice"><input type="radio" name="age" value="age6" checked><span>6–8 år</span></label>
-            <label class="choice"><input type="radio" name="age" value="age9"><span>9–12 år</span></label>
-            <label class="choice"><input type="radio" name="age" value="age13"><span>13–15 år</span></label>
-            <label class="choice"><input type="radio" name="age" value="age15"><span>15–18 år</span></label>
-            <label class="choice"><input type="radio" name="age" value="adult"><span>Vuxen</span></label>
-          </div>
+          <legend>Välj ålder för varje spelare</legend>
+          <div class="player-ages" id="player-ages"></div>
         </fieldset>
       </div>
       <button class="start" id="start" type="button">Starta spelet</button>
@@ -87,20 +83,28 @@
     </section>
   </main>
   <script>
+    const commonActions = ["äter en glass","har en stor hatt","åker cykel","badar i ett badkar","flyger med ballonger","dansar på ett bord","sover i en säng","spelar trummor","bygger ett sandslott","hoppar i en vattenpöl","bakar en tårta","kramar en nalle","läser en bok","åker i en raket","har randiga strumpor","fiskar i en sjö","sjunger i en mikrofon","gömmer sig bakom ett träd","balanserar en banan","målar en regnbåge","åker pulka","borstar tänderna","sparkar en boll","planterar en blomma","äter en smörgås"];
     const levels = {
-      age6: { label:"6–8 år", subjects:["En katt","En hund","En kanin","En mus","En groda","En ko","En gris","En häst","Ett lejon","En elefant","En apa","En pingvin","En krokodil","En drake","En robot","Ett spöke","En prinsessa","En pirat","En dinosaurie","En snögubbe"], actions:["äter en jättestor glass","har en tokig hatt","åker skateboard","badar i ett badkar","flyger med ballonger","dansar på ett bord","sover i en sko","spelar trummor","bygger ett sandslott","cyklar till månen","hoppar i en vattenpöl","bakar en tårta","bor i en tekopp","kramar en nalle","läser en bok upp och ner","åker i en raket","har randiga strumpor","fiskar i en hink","sjunger i en mikrofon","gömmer sig bakom en blomma","balanserar en banan","målar en regnbåge","åker pulka","borstar tänderna","leker med en jättestor boll"] },
-      age9: { label:"9–12 år", subjects:["En rymdkatt","En superhjälte","En trollkarl","En sjöjungfru","En vampyr","En enhörning","En alien","En detektiv","En ninja","En astronaut","En jätterobot","En havssköldpadda","En fenix","Ett bergstroll","En tidsresenär","En uppfinnare","En riddare","En bläckfisk","En yeti","En skelettpirat"], actions:["surfar på en komet","bygger ett slott av godis","tämjer en pytteliten drake","spelar schack med en krabba","flyger på en dammsugare","upptäcker en stad under vattnet","lagar pannkakor över en vulkan","åker skidor på en regnbåge","jagar en levande skugga","styr en bananformad ubåt","sover i ett spökhus","spelar fotboll på månen","räddar en katt ur ett moln","målar prickar på en giraff","bygger en tidsmaskin av kartonger","campar på ryggen av en val","hittar en skatt i kylskåpet","fäktas med en jättemorot","dirigerar en orkester av grodor","klättrar uppför ett glassberg","gör en snögubbe i öknen","kör en racerbil av ost","öppnar en butik för monster","tar en selfie med ett sjöodjur","planterar blommor på Mars"] },
-      age13: { label:"13–15 år", subjects:["En zombielärare","En kändisrobot","En vampyrdetektiv","En skejtande riddare","En spökpirat","En tidsresande katt","En superhjältemormor","En rockande yeti","En hemlig agent","En alienkock","En draktränare","En kunglig lama","En monsterfotograf","En sjöjungfrupilot","En ninjabagare","En astronautclown","En cyborgkanin","En trollkarlselev","En rymdviking","En osynlig influencer"], actions:["livesänder från månen","rymmer på en enhjuling","bygger ett disco i en grotta","tävlingsäter jättetacos","spelar gitarr för hajar","målar graffiti på ett rymdskepp","tar bussen med en drake","räddar en festival från robotar","dansar med ett skelettgäng","campar mitt i ett köpcentrum","gör film med ett sjöodjur","jagar en flygande mobiltelefon","spelar pingis mot ett spöke","bakar pizza på en vulkan","åker skidor efter en dinosaurie","startar ett band med pingviner","bygger ett torn av läskburkar","letar skatt på en konsert","kör moped på havsbotten","delar paraply med ett monster","städar stranden med robotar","planterar en skog på Mars","leder en parad för allas lika värde","lagar en trasig tidsmaskin","fotograferar ett UFO på skolgården"] },
-      age15: { label:"15–18 år", subjects:["En punkig prinsessa","En klimatdetektiv","En sömnig superhjälte","En feministisk viking","En rymd-DJ","En vampyr på semester","En tidsresande reporter","En elegant zombie","En rebellisk robot","En spion till sjöjungfru","En trollkarl med körkort","En rockstjärna till gorilla","En alienstudent","En skateboardninja","En drake i kostym","En pirat-influencer","En hemlig agentkanin","En operasjungande yeti","En cyborgkock","En spökpolitiker"], actions:["ordnar festival på ett isflak","målar en regnbågsflagga på månen","debatterar med en dinosaurie","ockuperar ett slott av godis","startar ett kooperativ för monster","räddar en val med en ubåt","spelar synt på ett hustak","jagar en självkörande kundvagn","grillar pizza över en vulkan","tar nattbussen med tre spöken","gör en dokumentär om drakar","bygger solceller åt ett troll","dansar balett i en rymddräkt","spelar basket mot utomjordingar","planterar blommor i en rondell","lagar en robot med silvertejp","leder ett luciatåg av zombier","säljer glass från ett piratskepp","campar i ett övergivet tivoli","fotograferar ett monster på tunnelbanan","delar ut cyklar till astronauter","stoppar en armé av gummiankor","fångar ett UFO med ett metspö","startar en kör för sjöodjur","bygger ett bibliotek under vattnet"] },
-      adult: { label:"Vuxen", subjects:["En förvirrad viking","En elegant gorilla","En pensionerad superhjälte","En stressad trollkarl","En kunglig pingvin","En sömnig astronaut","En hemlig agent","En rockstjärnerobot","En piratkapten","En operasjungande krokodil","En tidsresande bagare","En detektivlama","En riddare på semester","En vampyr med solglasögon","En jättebläckfisk","En zombiebrandman","En cirkusdirektör","En skäggig sjöjungfru","En rymdcowboy","En osynlig kock"], actions:["försöker parkera en drake","serverar middag på en bergstopp","smugglar en elefant i en resväska","dansar balett på ett isflak","bygger en möbel utan bruksanvisning","rastar en flock dinosaurier","spelar tennis mot ett spöke","flyr från en armé av gummiankor","beställer pizza från månen","målar ett porträtt med fötterna","håller tal för hundra katter","reparerar en ubåt med silvertejp","grillar korv över en vulkan","åker tandemcykel med ett monster","förklarar vägen för en alien","bär ett piano genom djungeln","fångar en haj med ett metspö","dirigerar trafik på havsbotten","bygger en raket av köksredskap","har picknick mitt i en orkan","tävlar mot en snigel i en racerbil","öppnar ett paraply under vattnet","gömmer en skatt i ett dockskåp","spelar trummor på ett sovande lejon","fotograferar ett sjöodjur"] }
+      age6: { label:"6–8 år", subjects:["En katt","En hund","En kanin","En mus","En groda","En ko","En gris","En häst","Ett lejon","En elefant","En apa","En pingvin","En krokodil","En drake","En robot","Ett spöke","En prinsessa","En pirat","En dinosaurie","En snögubbe"], actions:commonActions },
+      age9: { label:"9–12 år", subjects:["En rymdkatt","En superhjälte","En trollkarl","En sjöjungfru","En vampyr","En enhörning","En alien","En detektiv","En ninja","En astronaut","En robot","En sköldpadda","En fågel","Ett troll","En uppfinnare","En riddare","En bläckfisk","En yeti","En pirat","En drake"], actions:commonActions },
+      age13: { label:"13–15 år", subjects:["En zombielärare","En filmstjärna","En vampyr","En riddare","En spökpirat","En tidsresenär","En superhjälte","En rockstjärna","En hemlig agent","En alienkock","En draktränare","En kunglig lama","En fotograf","En sjöjungfru","En ninjabagare","En astronaut","En robotkanin","En trollkarl","En rymdviking","En björn"], actions:commonActions },
+      age15: { label:"15–18 år", subjects:["En punkprinsessa","En detektiv","En superhjälte","En viking","En DJ","En vampyr","En reporter","En zombie","En robot","En sjöjungfru","En trollkarl","En gorilla","En alien","En ninja","En drake","En pirat","En agentkanin","En yeti","En cyborgkock","Ett spöke"], actions:commonActions },
+      adult: { label:"Vuxen", subjects:["En viking","En gorilla","En superhjälte","En trollkarl","En pingvin","En astronaut","En hemlig agent","En robot","En piratkapten","En krokodil","En bagare","En detektivlama","En riddare","En vampyr","En bläckfisk","En zombiebrandman","En cirkusdirektör","En sjöjungfru","En cowboy","En kock"], actions:commonActions }
     };
-    const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), promptEl=document.querySelector("#prompt"), remaining=document.querySelector("#remaining"), turnEl=document.querySelector("#turn"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label");
-    let activeLevel="age6", playerCount=2, currentPlayer=0;
-    function buildDeck(level) { const cards=level.subjects.flatMap(subject=>level.actions.map(action=>`${subject} som ${action}`)); for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];} return cards; }
-    function draw() { const level=levels[activeLevel]; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(level); currentPlayer=currentPlayer%playerCount+1; turnEl.textContent=`Spelare ${currentPlayer} ritar`; promptEl.textContent=decks[activeLevel].pop(); remaining.textContent=`${decks[activeLevel].length} av 500 uppdrag kvar före omblandning`; message.textContent=currentPlayer===playerCount?"Sedan börjar vi om från spelare 1 – alla får lika många turer!":""; }
-    document.querySelector("#start").addEventListener("click",()=>{ playerCount=Number(document.querySelector('[name="players"]:checked').value); activeLevel=document.querySelector('[name="age"]:checked').value; currentPlayer=0; ageLabel.textContent=`${levels[activeLevel].label} · ${playerCount} spelare`; setup.classList.add("hidden"); game.classList.remove("hidden"); draw(); document.querySelector("#next").focus(); });
+    const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), promptEl=document.querySelector("#prompt"), remaining=document.querySelector("#remaining"), turnEl=document.querySelector("#turn"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages");
+    let players=[], playerCount=2, currentPlayer=0;
+    function renderPlayerAges() {
+      playerCount=Number(document.querySelector('[name="players"]:checked').value);
+      const previous=[...playerAges.querySelectorAll("select")].map(select=>select.value);
+      playerAges.innerHTML=Array.from({length:playerCount},(_,index)=>`<label class="player-age"><span>Spelare ${index+1}</span><select aria-label="Ålder för spelare ${index+1}">${Object.entries(levels).map(([key,level])=>`<option value="${key}" ${previous[index]===key?"selected":""}>${level.label}</option>`).join("")}</select></label>`).join("");
+    }
+    function buildDeck(level) { const cards=level.subjects.flatMap(subject=>level.actions.map(action=>`${subject} som ${action}`)); if(cards.length!==500||new Set(cards).size!==500) throw new Error(`${level.label} måste ha 500 unika uppdrag`); for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];} return cards; }
+    function draw() { currentPlayer=currentPlayer%playerCount+1; const activeLevel=players[currentPlayer-1], level=levels[activeLevel]; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(level); turnEl.textContent=`Spelare ${currentPlayer} ritar`; ageLabel.textContent=`Spelare ${currentPlayer} · ${level.label}`; promptEl.textContent=decks[activeLevel].pop(); remaining.textContent=`${decks[activeLevel].length} av 500 uppdrag kvar för ${level.label}`; message.textContent=currentPlayer===playerCount?"Sedan börjar vi om från spelare 1 – alla får lika många turer!":""; }
+    document.querySelectorAll('[name="players"]').forEach(input=>input.addEventListener("change",renderPlayerAges));
+    document.querySelector("#start").addEventListener("click",()=>{ players=[...playerAges.querySelectorAll("select")].map(select=>select.value); playerCount=players.length; currentPlayer=0; setup.classList.add("hidden"); game.classList.remove("hidden"); draw(); document.querySelector("#next").focus(); });
     document.querySelector("#next").addEventListener("click",draw);
     document.querySelector("#back").addEventListener("click",()=>{ game.classList.add("hidden"); setup.classList.remove("hidden"); document.querySelector("#start").focus(); });
+    renderPlayerAges();
   </script>
 </body>
 </html>
