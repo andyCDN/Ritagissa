@@ -49,7 +49,7 @@
   <main>
     <section class="panel" id="setup" aria-labelledby="title">
       <h1 id="title">Rita och gissa!</h1>
-      <p class="intro">Välj hur många som spelar och en egen ålder för varje spelare. Uppdragen är enkla, tydliga och roliga att rita!</p>
+      <p class="intro">Välj hur många som spelar och en egen ålder för varje spelare. Varje uppdrag består av en enkel figur och en enkel handling!</p>
       <div class="setup-grid">
         <fieldset>
           <legend>Hur många spelar?</legend>
@@ -83,13 +83,13 @@
     </section>
   </main>
   <script>
-    const commonActions = ["äter en glass","har en stor hatt","åker cykel","badar i ett badkar","flyger med ballonger","dansar på ett bord","sover i en säng","spelar trummor","bygger ett sandslott","hoppar i en vattenpöl","bakar en tårta","kramar en nalle","läser en bok","åker i en raket","har randiga strumpor","fiskar i en sjö","sjunger i en mikrofon","gömmer sig bakom ett träd","balanserar en banan","målar en regnbåge","åker pulka","borstar tänderna","sparkar en boll","planterar en blomma","äter en smörgås"];
+    const commonActions = ["sitter på en stol","står på ett ben","springer","hoppar","sover","äter ett äpple","dricker vatten","har en hatt","håller en ballong","sparkar en boll","vinkar","läser en bok","målar ett hus","cyklar","simmar","står under ett paraply","öppnar ett paket","tittar på månen","håller en blomma","spelar trummor","kramar en nalle","bakar en tårta","fiskar","kör en bil","bygger en snögubbe"];
     const levels = {
-      age6: { label:"6–8 år", subjects:["En katt","En hund","En kanin","En mus","En groda","En ko","En gris","En häst","Ett lejon","En elefant","En apa","En pingvin","En krokodil","En drake","En robot","Ett spöke","En prinsessa","En pirat","En dinosaurie","En snögubbe"], actions:commonActions },
-      age9: { label:"9–12 år", subjects:["En rymdkatt","En superhjälte","En trollkarl","En sjöjungfru","En vampyr","En enhörning","En alien","En detektiv","En ninja","En astronaut","En robot","En sköldpadda","En fågel","Ett troll","En uppfinnare","En riddare","En bläckfisk","En yeti","En pirat","En drake"], actions:commonActions },
-      age13: { label:"13–15 år", subjects:["En zombielärare","En filmstjärna","En vampyr","En riddare","En spökpirat","En tidsresenär","En superhjälte","En rockstjärna","En hemlig agent","En alienkock","En draktränare","En kunglig lama","En fotograf","En sjöjungfru","En ninjabagare","En astronaut","En robotkanin","En trollkarl","En rymdviking","En björn"], actions:commonActions },
-      age15: { label:"15–18 år", subjects:["En punkprinsessa","En detektiv","En superhjälte","En viking","En DJ","En vampyr","En reporter","En zombie","En robot","En sjöjungfru","En trollkarl","En gorilla","En alien","En ninja","En drake","En pirat","En agentkanin","En yeti","En cyborgkock","Ett spöke"], actions:commonActions },
-      adult: { label:"Vuxen", subjects:["En viking","En gorilla","En superhjälte","En trollkarl","En pingvin","En astronaut","En hemlig agent","En robot","En piratkapten","En krokodil","En bagare","En detektivlama","En riddare","En vampyr","En bläckfisk","En zombiebrandman","En cirkusdirektör","En sjöjungfru","En cowboy","En kock"], actions:commonActions }
+      age6: { label:"6–8 år", subjects:["En katt","En hund","En kanin","En mus","En groda","En ko","En gris","En häst","Ett lejon","En elefant","En apa","En pingvin","En krokodil","En björn","En fågel","En fisk","En flicka","En pojke","En dinosaurie","En snögubbe"], actions:commonActions },
+      age9: { label:"9–12 år", subjects:["En katt","En hund","En kanin","En groda","En häst","Ett lejon","En elefant","En apa","En pingvin","En björn","En fågel","En fisk","En drake","En robot","Ett spöke","En prinsessa","En pirat","En riddare","En astronaut","En dinosaurie"], actions:commonActions },
+      age13: { label:"13–15 år", subjects:["En katt","En hund","En häst","Ett lejon","En elefant","En apa","En pingvin","En björn","En drake","En robot","Ett spöke","En prinsessa","En pirat","En riddare","En astronaut","En trollkarl","En vampyr","En superhjälte","En detektiv","En ninja"], actions:commonActions },
+      age15: { label:"15–18 år", subjects:["En katt","En hund","En häst","Ett lejon","En apa","En björn","En drake","En robot","Ett spöke","En pirat","En riddare","En astronaut","En trollkarl","En vampyr","En superhjälte","En detektiv","En ninja","En kock","En lärare","En musiker"], actions:commonActions },
+      adult: { label:"Vuxen", subjects:["En katt","En hund","En häst","Ett lejon","En apa","En björn","En drake","En robot","Ett spöke","En pirat","En riddare","En astronaut","En trollkarl","En vampyr","En superhjälte","En detektiv","En kock","En lärare","En läkare","En musiker"], actions:commonActions }
     };
     const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), promptEl=document.querySelector("#prompt"), remaining=document.querySelector("#remaining"), turnEl=document.querySelector("#turn"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages");
     let players=[], playerCount=2, currentPlayer=0;
