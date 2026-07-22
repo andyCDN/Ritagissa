@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ff4fa3">
+<title>Rita och gissa!</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 8% 12%,#ff4fa3 0 9px,transparent 10px),radial-gradient(circle at 88% 18%,#ffd93d 0 10px,transparent 11px),radial-gradient(circle at 18% 82%,#4fd1ff 0 11px,transparent 12px),radial-gradient(circle at 78% 78%,#7cf29a 0 9px,transparent 10px),radial-gradient(circle at 52% 8%,#a78bfa 0 8px,transparent 9px),linear-gradient(135deg,#fff0f7 0%,#fff8cc 35%,#dff7ff 68%,#eefde8 100%)}
+main{width:min(720px,100%);padding:26px;text-align:center;background:#fffffff7;border:4px solid #222;border-radius:28px;box-shadow:10px 10px 0 #222,0 0 0 8px #ffffff73}
+h1{margin:0 0 8px;font-size:clamp(2rem,8vw,3.4rem);text-shadow:3px 3px 0 #ffd93d}
+.intro{margin:0 0 20px;font-size:1.05rem}
+#word{min-height:190px;display:grid;place-items:center;margin:18px 0 24px;padding:24px;border:4px dashed #ff4fa3;border-radius:22px;background:linear-gradient(135deg,#fff9d9,#ffe6f2,#e5f7ff);font-size:clamp(1.65rem,7vw,3.3rem);font-weight:800;line-height:1.1;overflow-wrap:anywhere;box-shadow:inset 0 0 0 4px #ffffffb3}
+.buttons{display:grid;grid-template-columns:1fr;gap:14px}
+button{width:100%;border:3px solid #222;border-radius:18px;padding:17px 20px;color:#111;font:inherit;font-size:1.2rem;font-weight:850;cursor:pointer;box-shadow:0 6px 0 #222;text-shadow:0 1px 0 #ffffff73}
+button:active{transform:translateY(5px);box-shadow:0 1px 0 #222}
+#harrietButton{background:#ff5fa2}#loButton{background:#4fc3ff}#adultButton{background:#7be495}
+#counter{min-height:1.3em;margin:18px 0 0;color:#555;font-size:.95rem}
+@media(min-width:640px){.buttons{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>Rita och gissa!</h1>
+<p class="intro">Tre nivåer – 500 knasiga rituppdrag på varje knapp.</p>
+<div id="word" aria-live="polite">Tryck på en knapp!</div>
+<div class="buttons">
+<button id="harrietButton" type="button">Harriet</button>
+<button id="loButton" type="button">Lo</button>
+<button id="adultButton" type="button">Vuxna</button>
+</div>
+<p id="counter"></p>
+</main>
+<script>
+const sets={
+ Harriet:[["en katt", "en hund", "en kanin", "en dinosaurie", "en robot", "ett monster", "en pingvin", "en elefant", "en giraff", "en snigel", "en groda", "en apa", "en pirat", "en prinsessa", "ett spöke", "en ko", "en haj", "en drake", "en potatis", "en banan", "en glass", "en pizza", "en blomma", "en sko", "en tandborste"],["med en jättestor hatt", "med glittriga stövlar", "med en kungakrona", "med små vingar", "på en skateboard", "på en röd cykel", "i en liten raket", "i ett badkar", "med tio ballonger", "med solglasögon", "med en lång mustasch", "med en full ryggsäck", "som äter en glass", "som dansar", "som spelar trummor", "som sover på ett moln", "som flyger med paraply", "som kör en pytteliten bil", "som badar i popcorn", "som bygger ett sandslott"]],
+ Lo:[["en detektivpingvin", "en robotpirat", "en ninjakatt", "en riddargroda", "en rymdkanin", "en monsterkock", "en polisuggla", "en trollkarlshund", "en superhjältepotatis", "en rockstjärnedrake", "en astronautapa", "en vampyrkanin", "en professorbläckfisk", "en racerförare-snigel", "en kunglig krokodil", "en spökpirat", "en jetpack-elefant", "en sjöjungfruprinsessa", "en uppfinnarhund", "en riddardinosaurie", "en cowboyko", "en agenthamster", "en häxa på semester", "en fotbollsspelande haj", "en kaptenbjörn"],["som driver en glasskiosk på månen", "som bygger en tidsmaskin av kartong", "som flyr från en popcornvulkan", "som spelar elgitarr på ett moln", "som letar efter en skatt i frysen", "som kör en ubåt genom skolan", "som tävlar mot en flygande cykel", "som bor i ett hemsökt trädhus", "som lagar tacos åt ett spöke", "som målar graffiti på ett slott", "som campar under vatten", "som spelar schack med en drake", "som åker rutschbana från ett rymdskepp", "som bygger en stad av godis", "som räddar ett monster ur ett badkar", "som jagas av en jättestor tandborste", "som ordnar fest i en vulkan", "som hittar en hemlig dörr i biblioteket", "som kör ett popcornskepp över havet", "som startar ett tivoli för spöken"]],
+ Vuxna:[["en mamma", "en pappa", "en mormor", "en morfar", "en lärare", "en läkare", "en brandman", "en polis", "en kock", "en bagare", "en frisör", "en byggarbetare", "en bonde", "en brevbärare", "en astronaut", "en kung", "en drottning", "en riddare", "en pirat", "en trollkarl", "en häxa", "en superhjälte", "en fotbollstränare", "en busschaufför", "en rockstjärna"],["som slåss mot ett tvättmonster", "som kör en bananbil", "som grillar på månen", "som flyger på en dammsugare", "som jagas av en jättestor strumpa", "som går ut med en dinosaurie", "som lagar middag åt tre monster", "som spelar trummor med fiskar", "som åker rullskridskor i köket", "som bygger ett slott av soffkuddar", "som fastnat i ett tält", "som badar i popcorn", "som försöker fånga en flygande pizza", "som tar en selfie med ett spöke", "som rider på en giraff", "som hänger tvätt i rymden", "som kör buss under vatten", "som spelar tennis mot en zombie", "som bakar en bulle stor som ett hus", "som åker skidor på stranden"]]
+};
+const decks={Harriet:[],Lo:[],Vuxna:[]};
+const word=document.getElementById('word'),counter=document.getElementById('counter');
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function refill(level){const [subjects,endings]=sets[level];decks[level]=shuffle(subjects.flatMap(s=>endings.map(e=>`${s} ${e}`)))}
+function draw(level){if(!decks[level].length)refill(level);word.textContent=decks[level].pop();counter.textContent=`${decks[level].length} uppdrag kvar för ${level}`}
+document.getElementById('harrietButton').onclick=()=>draw('Harriet');
+document.getElementById('loButton').onclick=()=>draw('Lo');
+document.getElementById('adultButton').onclick=()=>draw('Vuxna');
+Object.keys(decks).forEach(refill);
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+Publicera den här statiska webbsidan till GitHub-repot `andyCDN/Ritagissa`.
+
+Gör följande:
+
+1. Kontrollera om repot redan innehåller filer.
+2. Lägg `index.html` i repots rot.
+3. Bevara befintliga filer om de inte uttryckligen behöver ersättas.
+4. Commit-meddelande: `Publicera Rita och gissa`
+5. Push till `main`.
+6. Aktivera GitHub Pages från `main` och `/(root)` om det inte redan är aktiverat.
+7. Verifiera att den publika sidan laddar och att knapparna Harriet, Lo och Vuxna fungerar.
+8. Returnera den publika GitHub Pages-länken.
+
+Projektet är en fristående HTML-fil och kräver inget byggsteg.
