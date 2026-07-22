@@ -33,7 +33,7 @@
     .back { min-height:48px; padding:.6rem .9rem; color:var(--ink); background:#fff; font-size:1rem; }
     .turn { margin:1.25rem 0 .3rem; color:#5b3a87; font-size:clamp(1.2rem,3vw,1.55rem); font-weight:900; }
     .card { min-height:240px; display:grid; place-content:center; gap:.8rem; padding:clamp(1rem,4vw,2rem); border:4px dashed var(--purple); border-radius:24px; background:#f7efff; }
-    .eyebrow,.remaining { margin:0; font-weight:850; }
+    .eyebrow { margin:0; font-weight:850; }
     .eyebrow { color:var(--purple); letter-spacing:.08em; text-transform:uppercase; }
     #prompt { margin:0; font-size:clamp(1.65rem,5vw,3rem); line-height:1.15; font-weight:900; text-wrap:balance; }
     .next { width:min(100%,460px); min-height:76px; margin:1.25rem 0 .5rem; background:#d51e70; }
@@ -76,7 +76,7 @@
       <div class="game-head"><div><p class="eyebrow" id="age-label"></p><h2 id="game-title">Dags att rita!</h2></div><button class="back" id="back" type="button">← Ändra val</button></div>
       <p class="turn" id="turn">Spelare 1 ritar</p>
       <div class="card" aria-live="polite" aria-atomic="true">
-        <p class="eyebrow">Ditt uppdrag</p><p id="prompt">Tryck för ett rituppdrag!</p><p class="remaining" id="remaining"></p>
+        <p class="eyebrow">Ditt uppdrag</p><p id="prompt">Tryck för ett rituppdrag!</p>
       </div>
       <button class="next" id="next" type="button">Visa nästa uppdrag</button>
       <p class="message" id="message" aria-live="polite"></p>
@@ -92,7 +92,7 @@
       age15: { label:"15–18 år", subjects:[...baseSubjects,"En filmstjärna","En trummis","En pilot","En magiker","En moped","En hörlur","En hamburgare","En kaffekopp","En väckarklocka","En diskokula"] },
       adult: { label:"Vuxen", subjects:[...baseSubjects,"En turist","En domare","En bonde","En kapten","En frisör","En kaffekanna","En dammsugare","En tvättmaskin","En grill","En blomkruka"] }
     };
-    const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), promptEl=document.querySelector("#prompt"), remaining=document.querySelector("#remaining"), turnEl=document.querySelector("#turn"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages");
+    const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), promptEl=document.querySelector("#prompt"), turnEl=document.querySelector("#turn"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages");
     let players=[], playerCount=2, currentPlayer=0;
     function renderPlayerAges() {
       playerCount=Number(document.querySelector('[name="players"]:checked').value);
@@ -100,7 +100,7 @@
       playerAges.innerHTML=Array.from({length:playerCount},(_,index)=>`<label class="player-age"><span>Spelare ${index+1}</span><select aria-label="Ålder för spelare ${index+1}">${Object.entries(levels).map(([key,level])=>`<option value="${key}" ${previous[index]===key?"selected":""}>${level.label}</option>`).join("")}</select></label>`).join("");
     }
     function buildDeck(level) { const cards=level.subjects.flatMap(subject=>details.map(detail=>`${subject} ${detail}`)); if(cards.length!==5000||new Set(cards).size!==5000) throw new Error(`${level.label} måste ha 5 000 unika uppdrag`); for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];} return cards; }
-    function draw() { currentPlayer=currentPlayer%playerCount+1; const activeLevel=players[currentPlayer-1], level=levels[activeLevel]; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(level); turnEl.textContent=`Spelare ${currentPlayer} ritar`; ageLabel.textContent=`Spelare ${currentPlayer} · ${level.label}`; promptEl.textContent=decks[activeLevel].pop(); remaining.textContent=`${decks[activeLevel].length} av 5 000 uppdrag kvar för ${level.label}`; message.textContent=currentPlayer===playerCount?"Sedan börjar vi om från spelare 1 – alla får lika många turer!":""; }
+    function draw() { currentPlayer=currentPlayer%playerCount+1; const activeLevel=players[currentPlayer-1], level=levels[activeLevel]; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(level); turnEl.textContent=`Spelare ${currentPlayer} ritar`; ageLabel.textContent=`Spelare ${currentPlayer} · ${level.label}`; promptEl.textContent=decks[activeLevel].pop(); message.textContent=currentPlayer===playerCount?"Sedan börjar vi om från spelare 1 – alla får lika många turer!":""; }
     document.querySelectorAll('[name="players"]').forEach(input=>input.addEventListener("change",renderPlayerAges));
     document.querySelector("#start").addEventListener("click",()=>{ players=[...playerAges.querySelectorAll("select")].map(select=>select.value); playerCount=players.length; currentPlayer=0; setup.classList.add("hidden"); game.classList.remove("hidden"); draw(); document.querySelector("#next").focus(); });
     document.querySelector("#next").addEventListener("click",draw);
