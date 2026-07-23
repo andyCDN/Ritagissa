@@ -1,45 +1,94 @@
-# Rita och gissa
+import fs from "node:fs";
+import assert from "node:assert/strict";
 
-Ett färgglatt, mobilanpassat rit- och gissningsspel för 2–8 spelare.
+const html = fs.readFileSync("index.html", "utf8");
+const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+new Function(script);
+const dataScript = script.split("const decks")[0];
+const { levels, sillyPrompts, sillyPromptSet, modernPrompts, modernPromptSet, compoundPrefixes, compoundEndings, accessoryFigures, accessories, actionFigures, sillyActions, isDrawablePrompt } = new Function(`${dataScript}; return { levels, sillyPrompts, sillyPromptSet, modernPrompts, modernPromptSet, compoundPrefixes, compoundEndings, accessoryFigures, accessories, actionFigures, sillyActions, isDrawablePrompt };`)();
 
-## Så fungerar spelet
-
-På startsidan väljer gruppen antal spelare. Varje spelare kan ange ett valfritt namn och välja en egen åldersgrupp: 6–8 år, 9–12 år, 13–15 år, 15–18 år eller vuxen. Valen sparas endast lokalt i webbläsaren.
-
-Varje åldersgrupp har 15 gemensamma, mycket enkla figurer samt 25 egna åldersanpassade figurer. De kombineras med 30 handvalda extrasaker. Varje extrasak har ett passande mellanled: **med**, **i**, **på**, **under** eller **bredvid**. Resultatet blir korta uppdrag som ”Katt med hatt”, ”Robot i bil” och ”Hund under paraply”. Självkombinationer som ”Katt med katt” filtreras bort.
-
-Utöver dessa finns exakt **1 000 korta knasuppdrag** som blandas in i alla kortlekar:
-
-- 400 begripliga sammansättningar, till exempel **Bananbåt** och **Glassfontän**.
-- 250 figurer med en enkel sak, till exempel **Rumpa med solglasögon**.
-- 350 figurer med en enda synlig handling, till exempel **Prinsessan pruttar**.
-
-Varje knasuppdrag innehåller högst tre ord och bygger på välkända saker eller handlingar som går att visa med enkla former.
-
-Om ett uppdrag ändå känns svårt går det att trycka på **Nytt uppdrag**. Då får samma spelare ett nytt uppdrag. **Nästa spelare ▶** lämnar över turen. Inget uppdrag upprepas inom en åldersgrupp innan dess blandade kortlek är slut.
-
-Sidan använder en förstärkt 8-bitarsstil med pixelmönster, avskurna pixelhörn, blockskuggor, rutnätskort, blinkande pixelstjärnor och stegvisa knapptryck. Den har riktiga HTML-kontroller och `aria-live`. Den har inga externa beroenden, inget byggsteg och skickar inga uppgifter till en server.
-
-## Kör lokalt
-
-Öppna `index.html` direkt i en webbläsare.
-
-Kör de automatiska kontrollerna med:
-
-```bash
-node tests.mjs
-```
-
-## Publicering
-
-Sidan kan publiceras med GitHub Pages från `main` och mappen `/(root)`.
-
-## Testchecklista
-
-- Välj 2–8 spelare och ange olika namn och åldrar.
-- Kontrollera att rätt namn och ålder visas på varje tur.
-- Prova mellanleden **med**, **i**, **på**, **under** och **bredvid**.
-- Tryck på **Nytt uppdrag** och kontrollera att spelaren är densamma.
-- Tryck på **Nästa spelare ▶** och kontrollera att turen går vidare.
-- Ladda om sidan och kontrollera att grundinställningarna finns kvar.
-- Prova sidan i stående och liggande mobilformat.
+assert.equal(Object.keys(levels).length, 5);
+assert.equal(compoundPrefixes.length * compoundEndings.length, 400);
+assert.equal(accessoryFigures.length * accessories.length, 250);
+assert.equal(actionFigures.length * sillyActions.length, 350);
+assert.equal(sillyPrompts.length, 1000);
+assert.equal(sillyPromptSet.size, 1000);
+assert.ok(sillyPrompts.every(prompt => prompt.split(" ").length <= 5), "knasuppdragen ska vara korta");
+assert.ok(sillyPrompts.every(isDrawablePrompt), "alla knasuppdrag ska passera ritbarhetskontrollen");
+assert.ok(sillyPromptSet.has("Bananbåt"));
+assert.ok(sillyPromptSet.has("Glassfontän"));
+assert.ok(sillyPromptSet.has("Rumpa med solglasögon"));
+assert.ok(sillyPromptSet.has("Prinsessan pruttar"));
+assert.ok(sillyPromptSet.has("Pruttraket"));
+assert.ok(sillyPromptSet.has("Bajsfontän"));
+assert.ok(sillyPromptSet.has("Rumpa med kalsonger"));
+assert.ok(sillyPromptSet.has("Prinsessan tappar byxorna"));
+assert.ok(sillyPromptSet.has("Rumpan skjuter ärtor ur näsan"));
+assert.ok(compoundPrefixes.filter(prefix => ["rump","prutt","bajs","fis","kalsong","toalett","näs"].includes(prefix)).length >= 7, "många sammansättningar ska vara rejält knasiga");
+assert.ok(accessoryFigures.filter(figure => ["Rumpa","Pruttmoln","Bajskorv","Toalett","Kalsong","Näsa","Fot"].includes(figure)).length >= 7, "många knasiga figurer ska finnas");
+assert.equal(modernPrompts.length, 50);
+assert.equal(modernPromptSet.size, 50);
+assert.ok(modernPrompts.every(prompt => prompt.split(" ").length <= 4), "nutidsuppdragen ska vara korta");
+assert.ok(modernPromptSet.has("Six seven"));
+assert.ok(modernPromptSet.has("Siffrorna 6 och 7"));
+assert.ok(modernPromptSet.has("Dansande capybara"));
+assert.ok(modernPromptSet.has("Hund med VR-glasögon"));
+for (const [key, level] of Object.entries(levels)) {
+  assert.equal(level.figures.length, 40, `${key}: antal figurer`);
+  assert.equal(new Set(level.figures).size, 40, `${key}: unika figurer`);
+  assert.equal(level.extras.length, 30, `${key}: antal extrasaker`);
+  assert.equal(new Set(level.extras.map(({ word }) => word)).size, 30, `${key}: unika extrasaker`);
+  assert.deepEqual(new Set(level.extras.map(({ relation }) => relation)), new Set(["med", "i", "på", "under", "bredvid"]), `${key}: mellanled`);
+  const regularPrompts = level.figures.flatMap(figure => level.extras.filter(extra => extra.word !== figure).map(extra => `${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt => !sillyPromptSet.has(prompt) && !modernPromptSet.has(prompt));
+  const prompts = [...regularPrompts, ...sillyPrompts, ...modernPrompts];
+  assert.ok(regularPrompts.length >= 1100, `${key}: tillräckligt många vanliga uppdrag`);
+  assert.ok(prompts.length >= 2150, `${key}: tillräckligt många uppdrag totalt`);
+  assert.equal(new Set(prompts).size, prompts.length, `${key}: unika uppdrag`);
+  assert.ok(prompts.every(prompt => prompt.split(" ").length <= 5), `${key}: korta uppdrag`);
+}
+const specificSets = Object.values(levels).map(level => new Set(level.figures.slice(15)));
+for (let i = 0; i < specificSets.length; i++) for (let j = i + 1; j < specificSets.length; j++) {
+  assert.notDeepEqual(specificSets[i], specificSets[j], "åldersgrupperna ska skilja sig");
+}
+assert.match(html, /id="skip"/);
+assert.match(html, /id="next"/);
+assert.match(html, /id="reveal"/);
+assert.match(html, /class="hidden" id="prompt-wrap"/);
+assert.match(html, /id="turn-name"/);
+assert.match(html, /id="timer-start"/);
+assert.match(html, /id="finish"/);
+assert.equal((html.match(/<input type="radio" name="timer"/g) || []).length, 4);
+assert.equal((html.match(/<input type="radio" name="rounds"/g) || []).length, 4);
+assert.match(html, /aria-live="polite"/);
+assert.equal((html.match(/https?:\/\//g) || []).length, 1, "endast statistikens API får vara externt");
+assert.match(html, /https:\/\/api\.counterapi\.dev\/v1\/andycdn-ritagissa/);
+assert.match(html, /id="stats"/);
+for (const key of ["visits", "games", "turns", "skips"]) assert.match(html, new RegExp(`id="stat-${key}"`));
+assert.match(html, /Spelarnas namn sparas eller skickas aldrig/);
+assert.doesNotMatch(html, /incrementStat\([^)]*name/i, "namn får inte skickas till statistiken");
+assert.match(html, /ages:players\.map\(player=>player\.age\)/, "bara åldersval får sparas lokalt");
+assert.doesNotMatch(html, /JSON\.stringify\(\{playerCount,players\}\)/, "namn får inte sparas lokalt");
+assert.match(html, /saved\.players\.map\(player=>player\.age\)/, "äldre sparade namn ska rensas bort vid migrering");
+assert.match(html, /localStorage\.setItem/);
+assert.match(html, /class="pixel-banner"/);
+assert.match(html, /class="pixel-action"/);
+assert.match(html, /aria-label="Gå till nästa spelare"/);
+assert.match(html, /aria-label="Visa ett annat uppdrag för samma spelare"/);
+assert.equal((html.match(/aria-describedby="action-guide"/g) || []).length, 2);
+assert.match(html, /Nästa spelare →/);
+assert.match(html, /Jag har ritat klart/);
+assert.match(html, /Annat uppdrag/);
+assert.match(html, /Jag vill inte rita detta/);
+assert.ok(html.indexOf('id="next"') < html.indexOf('id="skip"'), "huvudhandlingen ska visas först");
+assert.ok(html.indexOf("<footer>") < html.indexOf('id="stats"'), "statistiken ska ligga efter sidfoten");
+assert.match(html, /function revealPrompt\(\)/);
+assert.match(html, /function startTimer\(\)/);
+assert.match(html, /completedTurns>=playerCount\*maxRounds/);
+assert.doesNotMatch(html, /serviceWorker|manifest\.webmanifest|apple-touch-icon/, "app- och offlineläget ska vara borttaget");
+assert.match(html, /clip-path:polygon/);
+assert.match(html, /@keyframes pixel-blink/);
+assert.match(html, /prefers-reduced-motion:reduce/);
+assert.doesNotMatch(html, /Pixelritkalas/);
+assert.doesNotMatch(html, /repeating-linear-gradient/);
+assert.match(html, /font-family:system-ui/);
+console.log("Alla innehålls- och HTML-kontroller passerade.");
