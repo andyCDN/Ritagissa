@@ -66,7 +66,7 @@
   <main>
     <section class="panel" id="setup" aria-labelledby="title">
       <h1 id="title">Rita och gissa!</h1>
-      <p class="intro">Välj antal spelare, valfritt namn och ålder. Spelet blandar tydliga uppdrag med enkla knasigheter och moderna fenomen som bananbåt, prinsessan pruttar och six seven.</p>
+      <p class="intro">Välj antal spelare, valfritt namn och ålder. Spelet blandar tydliga uppdrag med rejält knasiga motiv som pruttraket, rumpa med krona, prinsessan tappar byxorna och six seven.</p>
       <div class="setup-grid">
         <fieldset>
           <legend>Hur många spelar?</legend>
@@ -139,12 +139,12 @@
         extras:[{word:"kaffekopp",relation:"med"},{word:"dammsugare",relation:"med"},{word:"stekpanna",relation:"med"},{word:"resväska",relation:"med"},{word:"väckarklocka",relation:"med"},{word:"tvättmaskin",relation:"i"},{word:"kundvagn",relation:"i"},{word:"taxi",relation:"i"},{word:"kontorsstol",relation:"på"},{word:"gräsklippare",relation:"på"},{word:"soffa",relation:"på"},{word:"gatlykta",relation:"under"},{word:"balkong",relation:"under"},{word:"grill",relation:"bredvid"},{word:"blomkruka",relation:"bredvid"}]
       }
     };
-    const compoundPrefixes = ["banan","glass","pizza","taco","katt","hund","kanin","grod","gris","dinosaurie","robot","spök","regnbågs","prinsess","pirat","rump","prutt","korv","pannkaks","popcorn"];
+    const compoundPrefixes = ["banan","glass","pizza","taco","katt","hund","grod","dinosaurie","robot","spök","rump","prutt","bajs","fis","korv","kalsong","toalett","näs","pannkaks","popcorn"];
     const compoundEndings = ["båt","fontän","bil","hus","hatt","sko","stol","säng","cykel","raket","slott","tårta","boll","paraply","ryggsäck","gitarr","kamera","telefon","krona","torn"];
-    const accessoryFigures = ["Rumpa","Banan","Glass","Pizza","Katt","Hund","Kanin","Groda","Gris","Dinosaurie","Robot","Spöke","Prinsessa","Pirat","Clown","Astronaut","Superhjälte","Kung","Drottning","Viking","Cowboy","Kock","Lärare","Apa","Pingvin"];
-    const accessories = ["solglasögon","krona","hatt","mustasch","ballong","ryggsäck","rosett","stövlar","vingar","paraply"];
-    const actionFigures = ["prinsessan","katten","hunden","kaninen","grodan","grisen","dinosaurien","roboten","spöket","piraten","clownen","astronauten","superhjälten","kungen","drottningen","vikingen","cowboyen","kocken","läraren","apan","pingvinen","bananen","glassen","pizzan","rumpan","båten","bilen","raketen","månen","solen","blomman","bollen","hatten","skon","tårtan"];
-    const sillyActions = ["pruttar","dansar","sover","hoppar","vinkar","skrattar","nyser","sjunger","snarkar","flyger"];
+    const accessoryFigures = ["Rumpa","Pruttmoln","Bajskorv","Toalett","Kalsong","Näsa","Fot","Banan","Glass","Pizza","Katt","Hund","Groda","Gris","Dinosaurie","Robot","Spöke","Prinsessa","Pirat","Clown","Astronaut","Superhjälte","Kung","Apa","Pingvin"];
+    const accessories = ["solglasögon","krona","hatt","mustasch","ballong","toapapper","kalsonger","stövlar","vingar","paraply"];
+    const actionFigures = ["prinsessan","katten","hunden","kaninen","grodan","grisen","dinosaurien","roboten","spöket","piraten","clownen","astronauten","superhjälten","kungen","drottningen","vikingen","cowboyen","kocken","läraren","apan","pingvinen","bananen","glassen","pizzan","rumpan","toaletten","bajskorven","pruttmolnet","kalsongen","näsan","båten","bilen","raketen","månen","tårtan"];
+    const sillyActions = ["pruttar","rapar","petar näsan","tappar byxorna","äter strumpor","kramar toaletten","badar i sås","dansar på toaletten","har kalsonger på huvudet","skjuter ärtor ur näsan"];
     const sillyPrompts = [
       ...compoundPrefixes.flatMap(prefix=>compoundEndings.map(ending=>`${prefix}${ending}`)),
       ...accessoryFigures.flatMap(figure=>accessories.map(accessory=>`${figure} med ${accessory}`)),
@@ -152,7 +152,7 @@
     ].map(prompt=>prompt[0].toUpperCase()+prompt.slice(1));
     const modernPrompts = [
       "Six seven","Siffrorna 6 och 7","Six seven-händer","Skibidi-toalett","Sigma-katt","NPC-robot","Meme-hund","Meme-katt","Dansande capybara","Capybara med solglasögon",
-      "Anka med hörlurar","Katt med mobil","Hund tar selfie","Robot gör hjärta","Groda med gamingstol","Banan med selfiepinne","Pizza med hörlurar","Toalett med krona","Emoji med ben","Emoji med cowboyhatt",
+      "Anka med hörlurar","Katt med mobil","Hund tar selfie","Robot gör hjärta","Groda med gamingstol","Banan med selfiepinne","Pizza med hörlurar","Skibidi-toalett med krona","Emoji med ben","Emoji med cowboyhatt",
       "Flygande mobil","Mobil med ansikte","Surfplatta med fötter","Dansande avatar","Avatar med keps","Rosa gamingstol","Robot med ringlampa","Katt vid ringlampa","Hund med mikrofon","Capybara på skateboard",
       "Haj med sneakers","Groda med hoodie","Dinosaurie med hörlurar","Gaming-katt","Gaming-mormor","Dansande robot","Robot tar selfie","Katt gör hjärta","Hund gör hjärta","Banan gör hjärta",
       "Raket med wifi","Wifi med ansikte","Moln med wifi","Mobil på skateboard","Emoji på skateboard","Robot på hoverboard","Katt på hoverboard","Hund med VR-glasögon","Robot med VR-glasögon","Capybara med krona"
