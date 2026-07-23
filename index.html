@@ -172,8 +172,8 @@
       },
       age9: {
         label:"9–12 år",
-        figures:["krokodil","giraff","snigel","fjäril","drake","haj","bläckfisk","val","zebra","krabba","säl","ekorre","älg","papegoja","flamingo","spindel","delfin","sjöhäst","ninja","detektiv","sjöjungfru","monster","troll","fe","viking"],
-        extras:[{word:"gitarr",relation:"med"},{word:"kamera",relation:"med"},{word:"pizza",relation:"med"},{word:"skattkista",relation:"med"},{word:"ficklampa",relation:"med"},{word:"ubåt",relation:"i"},{word:"helikopter",relation:"i"},{word:"koja",relation:"i"},{word:"skateboard",relation:"på"},{word:"surfbräda",relation:"på"},{word:"berg",relation:"på"},{word:"bro",relation:"under"},{word:"vattenfall",relation:"under"},{word:"kaktus",relation:"bredvid"},{word:"vulkan",relation:"bredvid"}]
+        figures:["krokodil","giraff","snigel","fjäril","drake","haj","bläckfisk","val","zebra","krabba","säl","ekorre","älg","papegoja","flamingo","Harry Potter","Hermione Granger","Ron Weasley","Hagrid","Dobby","Hedwig","sorteringshatten","quidditchspelare","dementor","Voldemort"],
+        extras:[{word:"trollstav",relation:"med"},{word:"trolldryck",relation:"med"},{word:"magibok",relation:"med"},{word:"gyllene kvick",relation:"med"},{word:"chokladgroda",relation:"med"},{word:"Hogwarts-expressen",relation:"i"},{word:"flygande bil",relation:"i"},{word:"Hogwarts",relation:"i"},{word:"flygande kvast",relation:"på"},{word:"quidditchplan",relation:"på"},{word:"slottstak",relation:"på"},{word:"svävande ljus",relation:"under"},{word:"stenbro",relation:"under"},{word:"magisk kittel",relation:"bredvid"},{word:"uggla",relation:"bredvid"}]
       },
       age13: {
         label:"13–15 år",
@@ -191,17 +191,16 @@
         extras:[{word:"kaffekopp",relation:"med"},{word:"dammsugare",relation:"med"},{word:"stekpanna",relation:"med"},{word:"resväska",relation:"med"},{word:"väckarklocka",relation:"med"},{word:"tvättmaskin",relation:"i"},{word:"kundvagn",relation:"i"},{word:"taxi",relation:"i"},{word:"kontorsstol",relation:"på"},{word:"gräsklippare",relation:"på"},{word:"soffa",relation:"på"},{word:"gatlykta",relation:"under"},{word:"balkong",relation:"under"},{word:"grill",relation:"bredvid"},{word:"blomkruka",relation:"bredvid"}]
       }
     };
-    const compoundPrefixes = ["banan","glass","pizza","taco","katt","hund","grod","dinosaurie","robot","spök","rump","prutt","bajs","fis","korv","kalsong","toalett","näs","pannkaks","popcorn"];
-    const compoundEndings = ["båt","fontän","bil","hus","hatt","sko","stol","säng","cykel","raket","slott","tårta","boll","paraply","ryggsäck","gitarr","kamera","telefon","krona","torn"];
+    const curatedCompounds = ["Apkrona","Ballongfisk","Bananslott","Banantelefon","Bläckfiskgitarr","Broccolimonster","Clownfisk","Dinosauriesko","Draktoffla","Elefantballong","Enhörningsbuss","Fiskcykel","Glassmonster","Glassraket","Gurkpirat","Gurkslott","Hamburgerslott","Hundhelikopter","Hundraket","Kaktusglass","Kattkrona","Kattubåt","Korvdrake","Korvrobot","Lejonparaply","Monsterkudde","Monstermössa","Muffinsberg","Mössparaply","Ostmåne","Ostspöke","Pannkakshatt","Pannkaksplanet","Pingvinraket","Piratkanin","Pizzahatt","Pizzasol","Popcornmonster","Popcornvulkan","Potatiskung","Prinsesspotatis","Raketko","Robotanka","Robotbanan","Rullskridskokatt","Smörgåståg","Snigelracerbil","Snögubbsurfare","Sockermoln","Spagettiregn","Spindelbuss","Spökryggsäck","Strumpdrake","Strumpmonster","Tandborstdrake","Toalettbil","Toalettrobot","Trollkarlskorv","Vampyrbanan","Bananbåt","Glassfontän","Bajsraket","Bananrobot","Björnbuss","Blommonster","Chokladslott","Clownraket","Drakcykel","Elefanttoffla","Fiskflygplan","Glassbil","Grodgitarr","Gurkrobot","Hamburgerhatt","Häxglass","Kattballong","Katthelikopter","Kaninkrona","Kaktusbuss","Korvslott","Lejonryggsäck","Monsterbil","Muffinstorn","Ostrobot","Pannkaksraket","Pingvinhelikopter","Piratpotatis","Pizzabåt","Popcornraket","Potatisrobot","Prinsesskorv","Robotfisk","Rullskridskohund","Smörgåsraket","Snigelbuss","Snögubbscykel","Spagettimoln","Spökbil","Strumphatt","Toalettflygplan"];
     const accessoryFigures = ["Rumpa","Pruttmoln","Bajskorv","Toalett","Kalsong","Näsa","Fot","Banan","Glass","Pizza","Katt","Hund","Groda","Gris","Dinosaurie","Robot","Spöke","Prinsessa","Pirat","Clown","Astronaut","Superhjälte","Kung","Apa","Pingvin"];
     const accessories = ["solglasögon","krona","hatt","mustasch","ballong","toapapper","kalsonger","stövlar","vingar","paraply"];
-    const actionFigures = ["prinsessan","katten","hunden","kaninen","grodan","grisen","dinosaurien","roboten","spöket","piraten","clownen","astronauten","superhjälten","kungen","drottningen","vikingen","cowboyen","kocken","läraren","apan","pingvinen","bananen","glassen","pizzan","rumpan","toaletten","bajskorven","pruttmolnet","kalsongen","näsan","båten","bilen","raketen","månen","tårtan"];
-    const sillyActions = ["pruttar","rapar","petar näsan","tappar byxorna","äter strumpor","kramar toaletten","badar i sås","dansar på toaletten","har kalsonger på huvudet","skjuter ärtor ur näsan"];
+    const actionFigures = ["prinsessan","katten","hunden","kaninen","grodan","grisen","dinosaurien","roboten","spöket","piraten","clownen","astronauten","superhjälten","kungen","drottningen","vikingen","cowboyen","kocken","läraren","apan","pingvinen","häxan","trollkarlen","vampyren","rumpan"];
+    const sillyActions = ["pruttar","rapar","dansar","tappar byxorna","åker rullskridskor","jonglerar med korvar","badar i glass","sover på pizza","sjunger i toaletten","skjuter ärtor ur näsan"];
     const sillyPrompts = [
-      ...compoundPrefixes.flatMap(prefix=>compoundEndings.map(ending=>`${prefix}${ending}`)),
+      ...curatedCompounds,
       ...accessoryFigures.flatMap(figure=>accessories.map(accessory=>`${figure} med ${accessory}`)),
       ...actionFigures.flatMap(figure=>sillyActions.map(action=>`${figure[0].toUpperCase()+figure.slice(1)} ${action}`))
-    ].map(prompt=>prompt[0].toUpperCase()+prompt.slice(1));
+    ];
     const hardToDrawWords = ["känsla","idé","möte","budget","kris","demokrati","ekonomi"];
     function isDrawablePrompt(prompt) { const words=prompt.toLocaleLowerCase("sv-SE").split(/\s+/); return words.length<=5&&!hardToDrawWords.some(word=>words.includes(word)); }
     const modernPrompts = [
@@ -258,7 +257,7 @@
     function buildDeck(level) {
       const regularPrompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt=>!sillyPromptSet.has(prompt)&&!modernPromptSet.has(prompt));
       const prompts=[...regularPrompts,...sillyPrompts,...modernPrompts];
-      if(level.figures.length!==40||level.extras.length!==30||sillyPrompts.length!==1000||new Set(sillyPrompts).size!==1000||!sillyPrompts.every(isDrawablePrompt)||modernPrompts.length!==50||modernPromptSet.size!==50||regularPrompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
+      if(level.figures.length!==40||level.extras.length!==30||sillyPrompts.length!==600||new Set(sillyPrompts).size!==600||!sillyPrompts.every(isDrawablePrompt)||modernPrompts.length!==50||modernPromptSet.size!==50||regularPrompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
       for(let i=prompts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[prompts[i],prompts[j]]=[prompts[j],prompts[i]];} return prompts;
     }
     function showPrompt() { const activeLevel=players[currentPlayer-1].age; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(levels[activeLevel]); promptEl.textContent=decks[activeLevel].pop(); }
