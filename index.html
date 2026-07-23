@@ -66,7 +66,7 @@
   <main>
     <section class="panel" id="setup" aria-labelledby="title">
       <h1 id="title">Rita och gissa!</h1>
-      <p class="intro">Välj antal spelare, valfritt namn och ålder.</p>
+      <p class="intro">Välj antal spelare, valfritt namn och ålder. Spelet blandar tydliga uppdrag med enkla knasigheter och moderna fenomen som bananbåt, prinsessan pruttar och six seven.</p>
       <div class="setup-grid">
         <fieldset>
           <legend>Hur många spelar?</legend>
@@ -150,7 +150,15 @@
       ...accessoryFigures.flatMap(figure=>accessories.map(accessory=>`${figure} med ${accessory}`)),
       ...actionFigures.flatMap(figure=>sillyActions.map(action=>`${figure[0].toUpperCase()+figure.slice(1)} ${action}`))
     ].map(prompt=>prompt[0].toUpperCase()+prompt.slice(1));
+    const modernPrompts = [
+      "Six seven","Siffrorna 6 och 7","Six seven-händer","Skibidi-toalett","Sigma-katt","NPC-robot","Meme-hund","Meme-katt","Dansande capybara","Capybara med solglasögon",
+      "Anka med hörlurar","Katt med mobil","Hund tar selfie","Robot gör hjärta","Groda med gamingstol","Banan med selfiepinne","Pizza med hörlurar","Toalett med krona","Emoji med ben","Emoji med cowboyhatt",
+      "Flygande mobil","Mobil med ansikte","Surfplatta med fötter","Dansande avatar","Avatar med keps","Rosa gamingstol","Robot med ringlampa","Katt vid ringlampa","Hund med mikrofon","Capybara på skateboard",
+      "Haj med sneakers","Groda med hoodie","Dinosaurie med hörlurar","Gaming-katt","Gaming-mormor","Dansande robot","Robot tar selfie","Katt gör hjärta","Hund gör hjärta","Banan gör hjärta",
+      "Raket med wifi","Wifi med ansikte","Moln med wifi","Mobil på skateboard","Emoji på skateboard","Robot på hoverboard","Katt på hoverboard","Hund med VR-glasögon","Robot med VR-glasögon","Capybara med krona"
+    ];
     const sillyPromptSet = new Set(sillyPrompts);
+    const modernPromptSet = new Set(modernPrompts);
     const levels = Object.fromEntries(Object.entries(levelContent).map(([key,content])=>[
       key,{label:content.label,figures:[...commonFigures,...content.figures],extras:[...commonExtras,...content.extras]}
     ]));
@@ -173,9 +181,9 @@
       }));
     }
     function buildDeck(level) {
-      const regularPrompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt=>!sillyPromptSet.has(prompt));
-      const prompts=[...regularPrompts,...sillyPrompts];
-      if(level.figures.length!==40||level.extras.length!==30||sillyPrompts.length!==1000||new Set(sillyPrompts).size!==1000||regularPrompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
+      const regularPrompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt=>!sillyPromptSet.has(prompt)&&!modernPromptSet.has(prompt));
+      const prompts=[...regularPrompts,...sillyPrompts,...modernPrompts];
+      if(level.figures.length!==40||level.extras.length!==30||sillyPrompts.length!==1000||new Set(sillyPrompts).size!==1000||modernPrompts.length!==50||modernPromptSet.size!==50||regularPrompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
       for(let i=prompts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[prompts[i],prompts[j]]=[prompts[j],prompts[i]];} return prompts;
     }
     function showPrompt() { const activeLevel=players[currentPlayer-1].age; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(levels[activeLevel]); promptEl.textContent=decks[activeLevel].pop(); }
