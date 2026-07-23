@@ -1,43 +1,45 @@
-import fs from "node:fs";
-import assert from "node:assert/strict";
+# Rita och gissa
 
-const html = fs.readFileSync("index.html", "utf8");
-const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-new Function(script);
-const dataScript = script.split("const decks")[0];
-const { levels, sillyPrompts, sillyPromptSet, compoundPrefixes, compoundEndings, accessoryFigures, accessories, actionFigures, sillyActions } = new Function(`${dataScript}; return { levels, sillyPrompts, sillyPromptSet, compoundPrefixes, compoundEndings, accessoryFigures, accessories, actionFigures, sillyActions };`)();
+Ett färgglatt, mobilanpassat rit- och gissningsspel för 2–8 spelare.
 
-assert.equal(Object.keys(levels).length, 5);
-assert.equal(compoundPrefixes.length * compoundEndings.length, 400);
-assert.equal(accessoryFigures.length * accessories.length, 250);
-assert.equal(actionFigures.length * sillyActions.length, 350);
-assert.equal(sillyPrompts.length, 1000);
-assert.equal(sillyPromptSet.size, 1000);
-assert.ok(sillyPrompts.every(prompt => prompt.split(" ").length <= 3), "knasuppdragen ska vara korta");
-assert.ok(sillyPromptSet.has("Bananbåt"));
-assert.ok(sillyPromptSet.has("Glassfontän"));
-assert.ok(sillyPromptSet.has("Rumpa med solglasögon"));
-assert.ok(sillyPromptSet.has("Prinsessan pruttar"));
-for (const [key, level] of Object.entries(levels)) {
-  assert.equal(level.figures.length, 40, `${key}: antal figurer`);
-  assert.equal(new Set(level.figures).size, 40, `${key}: unika figurer`);
-  assert.equal(level.extras.length, 30, `${key}: antal extrasaker`);
-  assert.equal(new Set(level.extras.map(({ word }) => word)).size, 30, `${key}: unika extrasaker`);
-  assert.deepEqual(new Set(level.extras.map(({ relation }) => relation)), new Set(["med", "i", "på", "under", "bredvid"]), `${key}: mellanled`);
-  const regularPrompts = level.figures.flatMap(figure => level.extras.filter(extra => extra.word !== figure).map(extra => `${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt => !sillyPromptSet.has(prompt));
-  const prompts = [...regularPrompts, ...sillyPrompts];
-  assert.ok(regularPrompts.length >= 1100, `${key}: tillräckligt många vanliga uppdrag`);
-  assert.ok(prompts.length >= 2100, `${key}: tillräckligt många uppdrag totalt`);
-  assert.equal(new Set(prompts).size, prompts.length, `${key}: unika uppdrag`);
-  assert.ok(prompts.every(prompt => prompt.split(" ").length <= 4), `${key}: korta uppdrag`);
-}
-const specificSets = Object.values(levels).map(level => new Set(level.figures.slice(15)));
-for (let i = 0; i < specificSets.length; i++) for (let j = i + 1; j < specificSets.length; j++) {
-  assert.notDeepEqual(specificSets[i], specificSets[j], "åldersgrupperna ska skilja sig");
-}
-assert.match(html, /id="skip"/);
-assert.match(html, /id="next"/);
-assert.match(html, /aria-live="polite"/);
-assert.doesNotMatch(html, /https?:\/\//);
-assert.match(html, /localStorage\.setItem/);
-console.log("Alla innehålls- och HTML-kontroller passerade.");
+## Så fungerar spelet
+
+På startsidan väljer gruppen antal spelare. Varje spelare kan ange ett valfritt namn och välja en egen åldersgrupp: 6–8 år, 9–12 år, 13–15 år, 15–18 år eller vuxen. Valen sparas endast lokalt i webbläsaren.
+
+Varje åldersgrupp har 15 gemensamma, mycket enkla figurer samt 25 egna åldersanpassade figurer. De kombineras med 30 handvalda extrasaker. Varje extrasak har ett passande mellanled: **med**, **i**, **på**, **under** eller **bredvid**. Resultatet blir korta uppdrag som ”Katt med hatt”, ”Robot i bil” och ”Hund under paraply”. Självkombinationer som ”Katt med katt” filtreras bort.
+
+Utöver dessa finns exakt **1 000 korta knasuppdrag** som blandas in i alla kortlekar:
+
+- 400 begripliga sammansättningar, till exempel **Bananbåt** och **Glassfontän**.
+- 250 figurer med en enkel sak, till exempel **Rumpa med solglasögon**.
+- 350 figurer med en enda synlig handling, till exempel **Prinsessan pruttar**.
+
+Varje knasuppdrag innehåller högst tre ord och bygger på välkända saker eller handlingar som går att visa med enkla former.
+
+Om ett uppdrag ändå känns svårt går det att trycka på **Nytt uppdrag**. Då får samma spelare ett nytt uppdrag. **Nästa spelare ▶** lämnar över turen. Inget uppdrag upprepas inom en åldersgrupp innan dess blandade kortlek är slut.
+
+Sidan använder en förstärkt 8-bitarsstil med pixelmönster, avskurna pixelhörn, blockskuggor, rutnätskort, blinkande pixelstjärnor och stegvisa knapptryck. Den har riktiga HTML-kontroller och `aria-live`. Den har inga externa beroenden, inget byggsteg och skickar inga uppgifter till en server.
+
+## Kör lokalt
+
+Öppna `index.html` direkt i en webbläsare.
+
+Kör de automatiska kontrollerna med:
+
+```bash
+node tests.mjs
+```
+
+## Publicering
+
+Sidan kan publiceras med GitHub Pages från `main` och mappen `/(root)`.
+
+## Testchecklista
+
+- Välj 2–8 spelare och ange olika namn och åldrar.
+- Kontrollera att rätt namn och ålder visas på varje tur.
+- Prova mellanleden **med**, **i**, **på**, **under** och **bredvid**.
+- Tryck på **Nytt uppdrag** och kontrollera att spelaren är densamma.
+- Tryck på **Nästa spelare ▶** och kontrollera att turen går vidare.
+- Ladda om sidan och kontrollera att grundinställningarna finns kvar.
+- Prova sidan i stående och liggande mobilformat.
