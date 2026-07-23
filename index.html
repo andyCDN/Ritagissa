@@ -20,12 +20,13 @@
     .choices { display:grid; gap:.65rem; }
     .player-choices { grid-template-columns:repeat(4,1fr); }
     .player-ages { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; }
-    .player-age { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:.7rem; font-weight:850; }
-    .player-age select { width:100%; min-height:48px; padding:.55rem; border:4px solid var(--ink); border-radius:0; color:var(--ink); background:#fff; font-family:inherit; font-size:1rem; font-weight:800; }
+    .player-age { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:.45rem .7rem; font-weight:850; }
+    .player-age span { grid-row:1 / 3; }
+    .player-age input, .player-age select { width:100%; min-height:46px; padding:.5rem; border:4px solid var(--ink); border-radius:0; color:var(--ink); background:#fff; font-family:inherit; font-size:1rem; font-weight:800; }
     .choice input { position:absolute; opacity:0; pointer-events:none; }
     .choice span { display:grid; place-items:center; min-height:54px; padding:.55rem; border:4px solid var(--ink); border-radius:0; background:#fff; font-weight:850; cursor:pointer; box-shadow:4px 4px 0 var(--ink); }
     .choice input:checked + span { color:#fff; background:var(--purple); transform:translateY(3px); box-shadow:0 1px 0 var(--ink); }
-    .choice input:focus-visible + span, .player-age select:focus-visible, button:focus-visible { outline:5px solid #ffbd00; outline-offset:3px; }
+    .choice input:focus-visible + span, .player-age input:focus-visible, .player-age select:focus-visible, button:focus-visible { outline:5px solid #ffbd00; outline-offset:3px; }
     button { border:4px solid var(--ink); border-radius:0; color:#fff; background:var(--purple); font:850 clamp(1.15rem,3vw,1.55rem)/1.1 inherit; cursor:pointer; box-shadow:6px 6px 0 var(--ink); touch-action:manipulation; text-transform:uppercase; }
     button:active { transform:translateY(5px); box-shadow:0 1px 0 var(--ink); }
     .start { width:min(100%,440px); min-height:68px; margin:1.5rem auto 0; background:#087a4d; }
@@ -36,13 +37,14 @@
     .eyebrow { margin:0; font-weight:850; }
     .eyebrow { color:var(--purple); letter-spacing:.08em; text-transform:uppercase; }
     #prompt { margin:0; font-size:clamp(1.65rem,5vw,3rem); line-height:1.15; font-weight:900; text-wrap:balance; }
-    .next { width:min(100%,460px); min-height:76px; margin:1.25rem 0 .5rem; background:#d51e70; }
+    .actions { display:flex; justify-content:center; align-items:stretch; gap:1rem; margin-top:1rem; }
+    .next { width:min(100%,360px); min-height:68px; background:#d51e70; }
     .skip-info { margin:1rem 0 .55rem; font-weight:800; }
-    .skip { min-height:52px; padding:.65rem 1rem; color:var(--ink); background:#fff; font-size:1rem; }
+    .skip { width:min(100%,300px); min-height:68px; padding:.65rem 1rem; color:var(--ink); background:#fff; font-size:1rem; }
     .message { min-height:1.5em; margin:.6rem 0 0; font-weight:800; color:#08704a; }
     .hidden { display:none; }
     footer { margin-top:1.5rem; font-weight:750; }
-    @media (max-width:700px) { .player-ages{grid-template-columns:1fr}.game-head{align-items:flex-start} }
+    @media (max-width:700px) { .player-ages{grid-template-columns:1fr}.game-head{align-items:flex-start}.actions{flex-direction:column;align-items:center} }
     @media (max-width:390px) { .player-choices{grid-template-columns:repeat(3,1fr)} }
     @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } }
   </style>
@@ -51,7 +53,7 @@
   <main>
     <section class="panel" id="setup" aria-labelledby="title">
       <h1 id="title">Rita och gissa!</h1>
-      <p class="intro">Välj hur många som spelar och en egen ålder för varje spelare. Varje uppdrag har två enkla saker med ett kort mellanled som passar bilden.</p>
+      <p class="intro">Välj antal spelare, valfritt namn och ålder. Spelet ger korta, handvalda uppdrag som passar åldern.</p>
       <div class="setup-grid">
         <fieldset>
           <legend>Hur många spelar?</legend>
@@ -81,49 +83,79 @@
         <p class="eyebrow">Ditt uppdrag</p><p id="prompt">Tryck för ett rituppdrag!</p>
       </div>
       <p class="skip-info">Svårt att rita eller förstå? Byt uppdrag – samma spelare får försöka igen.</p>
-      <button class="skip" id="skip" type="button">Byt uppdrag</button><br>
-      <button class="next" id="next" type="button">Visa nästa uppdrag</button>
+      <div class="actions"><button class="skip" id="skip" type="button">🎲 Nytt uppdrag</button><button class="next" id="next" type="button">Nästa spelare →</button></div>
       <p class="message" id="message" aria-live="polite"></p>
     </section>
   </main>
   <script>
-    const things = ["katt","hund","kanin","mus","groda","gris","häst","lejon","elefant","apa","pingvin","björn","fågel","fisk","krokodil","giraff","snigel","fjäril","drake","dinosaurie","ko","får","höna","anka","bi","nyckelpiga","haj","bläckfisk","sköldpadda","räv","uggla","myra","val","zebra","krabba","säl","get","ekorre","älg","panda","hamster","papegoja","flamingo","spindel","delfin","sjöhäst","orm","kamel","tiger","känguru","robot","spöke","enhörning","prinsessa","pirat","clown","barn","häxa","riddare","astronaut","superhjälte","kung","drottning","viking","cowboy","bagare","läkare","lärare","brandman","kock","musiker","ninja","detektiv","sjöjungfru","monster","troll","fe","snögubbe","docka","nalle","banan","äpple","päron","apelsin","jordgubbe","morot","glass","pizza","tårta","hamburgare","korv","ägg","ost","bulle","kaka","pannkaka","popcorn","sko","hatt","vante","socka","tröja","ryggsäck","bok","penna","sax","nyckel","telefon","kopp","sked","tandborste","paraply","stol","soffa","säng","bord","lampa","kamera","gitarr","boll","ballong","krona","hus","slott","bil","båt","raket","cykel","tåg","traktor","flygplan","brandbil","buss","helikopter","måne","sol","moln","träd","blomma","regnbåge","stjärna","hjärta","berg","vulkan","ö","strand","kaktus","palm","tulpan","solros"];
-    const levelInfo = {
-      age6: { label:"6–8 år", offset:0 },
-      age9: { label:"9–12 år", offset:30 },
-      age13: { label:"13–15 år", offset:60 },
-      age15: { label:"15–18 år", offset:90 },
-      adult: { label:"Vuxen", offset:120 }
+    const commonFigures = ["katt","hund","kanin","mus","groda","gris","häst","björn","fågel","fisk","robot","spöke","dinosaurie","pirat","astronaut"];
+    const commonExtras = [
+      {word:"hatt",relation:"med"},{word:"krona",relation:"med"},{word:"ballong",relation:"med"},{word:"glass",relation:"med"},{word:"bok",relation:"med"},{word:"boll",relation:"med"},
+      {word:"bil",relation:"i"},{word:"båt",relation:"i"},{word:"raket",relation:"i"},
+      {word:"stol",relation:"på"},{word:"cykel",relation:"på"},{word:"måne",relation:"på"},
+      {word:"paraply",relation:"under"},{word:"träd",relation:"under"},{word:"blomma",relation:"bredvid"}
+    ];
+    const levelContent = {
+      age6: {
+        label:"6–8 år",
+        figures:["lejon","elefant","apa","pingvin","ko","får","höna","anka","bi","nyckelpiga","sköldpadda","räv","uggla","panda","hamster","enhörning","prinsessa","clown","barn","häxa","snögubbe","docka","nalle","banan","äpple"],
+        extras:[{word:"tårta",relation:"med"},{word:"tandborste",relation:"med"},{word:"ryggsäck",relation:"med"},{word:"sko",relation:"med"},{word:"kopp",relation:"i"},{word:"säng",relation:"i"},{word:"tåg",relation:"i"},{word:"gunga",relation:"på"},{word:"moln",relation:"på"},{word:"matta",relation:"på"},{word:"bord",relation:"under"},{word:"regnbåge",relation:"under"},{word:"hus",relation:"bredvid"},{word:"solros",relation:"bredvid"},{word:"slott",relation:"bredvid"}]
+      },
+      age9: {
+        label:"9–12 år",
+        figures:["krokodil","giraff","snigel","fjäril","drake","haj","bläckfisk","val","zebra","krabba","säl","ekorre","älg","papegoja","flamingo","spindel","delfin","sjöhäst","ninja","detektiv","sjöjungfru","monster","troll","fe","viking"],
+        extras:[{word:"gitarr",relation:"med"},{word:"kamera",relation:"med"},{word:"pizza",relation:"med"},{word:"skattkista",relation:"med"},{word:"ficklampa",relation:"med"},{word:"ubåt",relation:"i"},{word:"helikopter",relation:"i"},{word:"koja",relation:"i"},{word:"skateboard",relation:"på"},{word:"surfbräda",relation:"på"},{word:"berg",relation:"på"},{word:"bro",relation:"under"},{word:"vattenfall",relation:"under"},{word:"kaktus",relation:"bredvid"},{word:"vulkan",relation:"bredvid"}]
+      },
+      age13: {
+        label:"13–15 år",
+        figures:["tiger","känguru","varg","kamel","gorilla","vampyr","zombie","riddare","superhjälte","kung","drottning","cowboy","musiker","kock","bagare","läkare","lärare","brandman","fotograf","trummis","sångare","dansare","pilot","trollkarl","samuraj"],
+        extras:[{word:"hörlur",relation:"med"},{word:"mikrofon",relation:"med"},{word:"spelkontroll",relation:"med"},{word:"mobil",relation:"med"},{word:"hamburgare",relation:"med"},{word:"husbil",relation:"i"},{word:"flygplan",relation:"i"},{word:"biograf",relation:"i"},{word:"moped",relation:"på"},{word:"scen",relation:"på"},{word:"tak",relation:"på"},{word:"gatlykta",relation:"under"},{word:"bro",relation:"under"},{word:"staty",relation:"bredvid"},{word:"fontän",relation:"bredvid"}]
+      },
+      age15: {
+        label:"15–18 år",
+        figures:["filmstjärna","rockstjärna","gamer","cyborg","samuraj","fotograf","regissör","sångare","dansare","trummis","pilot","trollkarl","detektiv","ninja","vampyr","zombie","superhjälte","viking","cowboy","kock","läkare","lärare","brandman","rappare","alien"],
+        extras:[{word:"solglasögon",relation:"med"},{word:"elgitarr",relation:"med"},{word:"kaffekopp",relation:"med"},{word:"mobil",relation:"med"},{word:"resväska",relation:"med"},{word:"taxi",relation:"i"},{word:"husbil",relation:"i"},{word:"hiss",relation:"i"},{word:"motorcykel",relation:"på"},{word:"scen",relation:"på"},{word:"tak",relation:"på"},{word:"gatlykta",relation:"under"},{word:"bro",relation:"under"},{word:"bankomat",relation:"bredvid"},{word:"staty",relation:"bredvid"}]
+      },
+      adult: {
+        label:"Vuxen",
+        figures:["turist","domare","bonde","kapten","frisör","brevbärare","snickare","målare","mekaniker","tandläkare","bibliotekarie","fotograf","kock","lärare","läkare","pilot","detektiv","musiker","bagare","brandman","kung","drottning","viking","cowboy","clown"],
+        extras:[{word:"kaffekopp",relation:"med"},{word:"dammsugare",relation:"med"},{word:"stekpanna",relation:"med"},{word:"resväska",relation:"med"},{word:"väckarklocka",relation:"med"},{word:"tvättmaskin",relation:"i"},{word:"kundvagn",relation:"i"},{word:"taxi",relation:"i"},{word:"kontorsstol",relation:"på"},{word:"gräsklippare",relation:"på"},{word:"soffa",relation:"på"},{word:"gatlykta",relation:"under"},{word:"balkong",relation:"under"},{word:"grill",relation:"bredvid"},{word:"blomkruka",relation:"bredvid"}]
+      }
     };
-    function takeRotated(items, offset, count) { return Array.from({length:count},(_,index)=>items[(offset+index)%items.length]); }
-    function capitalize(item) { return item.charAt(0).toUpperCase()+item.slice(1); }
-    const relations = {
-      "i":new Set(["hus","slott","bil","båt","raket","tåg","flygplan","brandbil","buss","helikopter","kopp"]),
-      "på":new Set(["stol","soffa","säng","bord","cykel","traktor","måne","berg","ö","strand"]),
-      "under":new Set(["paraply","moln","träd","palm"]),
-      "bredvid":new Set(["blomma","kaktus","tulpan","solros","vulkan"])
-    };
-    function relationFor(symbol) { return Object.entries(relations).find(([,items])=>items.has(symbol))?.[0]||"med"; }
-    const levels = Object.fromEntries(Object.entries(levelInfo).map(([key,info])=>[
-      key,
-      { label:info.label, figures:takeRotated(things,info.offset,100), symbols:takeRotated(things,info.offset+50,100) }
+    const levels = Object.fromEntries(Object.entries(levelContent).map(([key,content])=>[
+      key,{label:content.label,figures:[...commonFigures,...content.figures],extras:[...commonExtras,...content.extras]}
     ]));
     const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), promptEl=document.querySelector("#prompt"), turnEl=document.querySelector("#turn"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages");
     let players=[], playerCount=2, currentPlayer=0;
+    function loadSettings() { try { return JSON.parse(localStorage.getItem("ritagissa-settings"))||{}; } catch { return {}; } }
+    function saveSettings() { localStorage.setItem("ritagissa-settings",JSON.stringify({playerCount,players})); }
+    function playerName(index) { return String(players[index]?.name||"").trim()||`Spelare ${index+1}`; }
     function renderPlayerAges() {
       playerCount=Number(document.querySelector('[name="players"]:checked').value);
-      const previous=[...playerAges.querySelectorAll("select")].map(select=>select.value);
-      playerAges.innerHTML=Array.from({length:playerCount},(_,index)=>`<label class="player-age"><span>Spelare ${index+1}</span><select aria-label="Ålder för spelare ${index+1}">${Object.entries(levels).map(([key,level])=>`<option value="${key}" ${previous[index]===key?"selected":""}>${level.label}</option>`).join("")}</select></label>`).join("");
+      const previous=[...playerAges.querySelectorAll(".player-age")].map(row=>({name:row.querySelector("input").value,age:row.querySelector("select").value}));
+      playerAges.replaceChildren(...Array.from({length:playerCount},(_,index)=>{
+        const row=document.createElement("label"); row.className="player-age";
+        const label=document.createElement("span"); label.textContent=`Spelare ${index+1}`;
+        const name=document.createElement("input"); name.type="text"; name.maxLength=20; name.placeholder="Namn (valfritt)"; name.setAttribute("aria-label",`Namn för spelare ${index+1}`); name.value=previous[index]?.name||players[index]?.name||"";
+        const age=document.createElement("select"); age.setAttribute("aria-label",`Ålder för spelare ${index+1}`);
+        for(const [key,level] of Object.entries(levels)){const option=document.createElement("option"); option.value=key; option.textContent=level.label; age.append(option);}
+        age.value=previous[index]?.age||players[index]?.age||"age6";
+        row.append(label,name,age); return row;
+      }));
     }
-    function buildDeck(level) { const cardCount=level.figures.length*level.symbols.length; if(level.figures.length!==100||level.symbols.length!==100||cardCount!==10000||new Set(level.figures).size!==100||new Set(level.symbols).size!==100) throw new Error(`${level.label} måste ha 100 figurer och 100 unika symboler`); const cards=Array.from({length:cardCount},(_,index)=>index); for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];} return cards; }
-    function showPrompt() { const activeLevel=players[currentPlayer-1], level=levels[activeLevel]; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(level); const card=decks[activeLevel].pop(), figure=level.figures[Math.floor(card/level.symbols.length)], symbol=level.symbols[card%level.symbols.length]; promptEl.textContent=`${capitalize(figure)} ${relationFor(symbol)} ${symbol}`; }
-    function draw() { currentPlayer=currentPlayer%playerCount+1; const level=levels[players[currentPlayer-1]]; turnEl.textContent=`Spelare ${currentPlayer} ritar`; ageLabel.textContent=`Spelare ${currentPlayer} · ${level.label}`; message.textContent=currentPlayer===playerCount?"Sedan börjar vi om från spelare 1 – alla får lika många turer!":""; showPrompt(); }
+    function buildDeck(level) {
+      const prompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`));
+      if(level.figures.length!==40||level.extras.length!==30||prompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
+      for(let i=prompts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[prompts[i],prompts[j]]=[prompts[j],prompts[i]];} return prompts;
+    }
+    function showPrompt() { const activeLevel=players[currentPlayer-1].age; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(levels[activeLevel]); promptEl.textContent=decks[activeLevel].pop(); }
+    function draw() { currentPlayer=currentPlayer%playerCount+1; const level=levels[players[currentPlayer-1].age],name=playerName(currentPlayer-1); turnEl.textContent=`${name} ritar`; ageLabel.textContent=`${name} · ${level.label}`; message.textContent=currentPlayer===playerCount?"Sedan börjar vi om från den första spelaren – alla får lika många turer!":""; showPrompt(); }
     document.querySelectorAll('[name="players"]').forEach(input=>input.addEventListener("change",renderPlayerAges));
-    document.querySelector("#start").addEventListener("click",()=>{ players=[...playerAges.querySelectorAll("select")].map(select=>select.value); playerCount=players.length; currentPlayer=0; setup.classList.add("hidden"); game.classList.remove("hidden"); draw(); document.querySelector("#next").focus(); });
+    document.querySelector("#start").addEventListener("click",()=>{ players=[...playerAges.querySelectorAll(".player-age")].map(row=>({name:row.querySelector("input").value,age:row.querySelector("select").value})); playerCount=players.length; saveSettings(); currentPlayer=0; setup.classList.add("hidden"); game.classList.remove("hidden"); draw(); document.querySelector("#next").focus(); });
     document.querySelector("#next").addEventListener("click",draw);
     document.querySelector("#skip").addEventListener("click",showPrompt);
     document.querySelector("#back").addEventListener("click",()=>{ game.classList.add("hidden"); setup.classList.remove("hidden"); document.querySelector("#start").focus(); });
-    renderPlayerAges();
+    const saved=loadSettings(); players=Array.isArray(saved.players)?saved.players:[]; playerCount=Math.min(8,Math.max(2,Number(saved.playerCount)||2)); const playerRadio=document.querySelector(`[name="players"][value="${playerCount}"]`); if(playerRadio) playerRadio.checked=true; renderPlayerAges();
   </script>
 </body>
 </html>
