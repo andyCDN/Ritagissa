@@ -54,10 +54,16 @@
     .skip-info { max-width:650px; margin:1.15rem auto .7rem; padding:.75rem; border:4px solid var(--ink); background:#fff1a8; box-shadow:4px 4px 0 var(--ink); line-height:1.45; font-weight:750; }
     .skip { width:min(100%,330px); color:var(--ink); background:#fff; }
     .message { min-height:1.5em; margin:.6rem 0 0; font-weight:800; color:#08704a; }
+    .stats { margin:1.5rem auto 0; padding:1rem; border:4px solid var(--ink); background:#eef8ff; box-shadow:4px 4px 0 var(--blue); text-align:left; }
+    .stats summary { cursor:pointer; font-weight:900; }
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; margin-top:1rem; }
+    .stat { padding:.7rem .35rem; border:3px solid var(--ink); background:#fff; text-align:center; }
+    .stat strong { display:block; color:var(--purple); font:900 1.45rem/1 "Courier New",ui-monospace,monospace; }
+    .stats-note { margin:.8rem 0 0; font-size:.9rem; line-height:1.4; }
     .hidden { display:none; }
     footer { margin-top:1.5rem; padding-top:1rem; border-top:4px dashed var(--purple); font-weight:750; }
     @keyframes pixel-blink { 50% { opacity:.25; transform:scale(.7); } }
-    @media (max-width:700px) { .player-ages{grid-template-columns:1fr}.game-head{align-items:flex-start}.actions{flex-direction:column;align-items:center} }
+    @media (max-width:700px) { .player-ages{grid-template-columns:1fr}.game-head{align-items:flex-start}.actions{flex-direction:column;align-items:center}.stats-grid{grid-template-columns:repeat(2,1fr)} }
     @media (max-width:390px) { .player-choices{grid-template-columns:repeat(3,1fr)} }
     @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
   </style>
@@ -86,6 +92,16 @@
         </fieldset>
       </div>
       <button class="start" id="start" type="button">▶ Starta spelet</button>
+      <details class="stats" id="stats">
+        <summary>Öppen spelstatistik</summary>
+        <div class="stats-grid">
+          <div class="stat"><strong id="stat-visits">–</strong><span>besök</span></div>
+          <div class="stat"><strong id="stat-games">–</strong><span>startade spel</span></div>
+          <div class="stat"><strong id="stat-turns">–</strong><span>klara turer</span></div>
+          <div class="stat"><strong id="stat-skips">–</strong><span>bytta uppdrag</span></div>
+        </div>
+        <p class="stats-note" id="stats-note">Statistiken är offentlig och innehåller bara totalsiffror. Spelarnas namn sparas eller skickas aldrig.</p>
+      </details>
       <footer>Rita snällt, gissa fritt och hjälp varandra. ✊🌈</footer>
     </section>
 
@@ -159,13 +175,34 @@
     ];
     const sillyPromptSet = new Set(sillyPrompts);
     const modernPromptSet = new Set(modernPrompts);
+    const statsBase = "https://api.counterapi.dev/v1/andycdn-ritagissa";
+    const statKeys = ["visits","games","turns","skips"];
     const levels = Object.fromEntries(Object.entries(levelContent).map(([key,content])=>[
       key,{label:content.label,figures:[...commonFigures,...content.figures],extras:[...commonExtras,...content.extras]}
     ]));
     const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), promptEl=document.querySelector("#prompt"), turnEl=document.querySelector("#turn"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages");
     let players=[], playerCount=2, currentPlayer=0;
     function loadSettings() { try { return JSON.parse(localStorage.getItem("ritagissa-settings"))||{}; } catch { return {}; } }
-    function saveSettings() { localStorage.setItem("ritagissa-settings",JSON.stringify({playerCount,players})); }
+    function saveSettings() { localStorage.setItem("ritagissa-settings",JSON.stringify({playerCount,ages:players.map(player=>player.age)})); }
+    function readCount(value) {
+      if(typeof value==="number") return value;
+      if(!value||typeof value!=="object") return null;
+      for(const key of ["count","up_count","value"]) if(Number.isFinite(Number(value[key]))) return Number(value[key]);
+      for(const child of Object.values(value)){const count=readCount(child);if(count!==null)return count;}
+      return null;
+    }
+    async function requestStat(key,increment=false) {
+      const response=await fetch(`${statsBase}/${key}/${increment?"up":""}`,{cache:"no-store",referrerPolicy:"no-referrer"});
+      if(!response.ok) throw new Error("Statistiken svarar inte");
+      const count=readCount(await response.json());
+      if(count===null) throw new Error("Statistiken saknar ett värde");
+      document.querySelector(`#stat-${key}`).textContent=count.toLocaleString("sv-SE");
+    }
+    async function updatePublicStats() {
+      const results=await Promise.allSettled(statKeys.map(key=>requestStat(key)));
+      document.querySelector("#stats-note").textContent=results.some(result=>result.status==="rejected")?"Statistiken kunde inte hämtas just nu. Inga spelarnamn sparas eller skickas.":"Statistiken är offentlig och innehåller bara totalsiffror. Spelarnas namn sparas eller skickas aldrig.";
+    }
+    function incrementStat(key) { requestStat(key,true).catch(()=>{}); }
     function playerName(index) { return String(players[index]?.name||"").trim()||`Spelare ${index+1}`; }
     function renderPlayerAges() {
       playerCount=Number(document.querySelector('[name="players"]:checked').value);
@@ -173,7 +210,7 @@
       playerAges.replaceChildren(...Array.from({length:playerCount},(_,index)=>{
         const row=document.createElement("label"); row.className="player-age";
         const label=document.createElement("span"); label.textContent=`Spelare ${index+1}`;
-        const name=document.createElement("input"); name.type="text"; name.maxLength=20; name.placeholder="Namn (valfritt)"; name.setAttribute("aria-label",`Namn för spelare ${index+1}`); name.value=previous[index]?.name||players[index]?.name||"";
+        const name=document.createElement("input"); name.type="text"; name.maxLength=20; name.placeholder="Namn (valfritt)"; name.setAttribute("aria-label",`Namn för spelare ${index+1}`); name.value=previous[index]?.name||"";
         const age=document.createElement("select"); age.setAttribute("aria-label",`Ålder för spelare ${index+1}`);
         for(const [key,level] of Object.entries(levels)){const option=document.createElement("option"); option.value=key; option.textContent=level.label; age.append(option);}
         age.value=previous[index]?.age||players[index]?.age||"age6";
@@ -189,11 +226,11 @@
     function showPrompt() { const activeLevel=players[currentPlayer-1].age; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(levels[activeLevel]); promptEl.textContent=decks[activeLevel].pop(); }
     function draw() { currentPlayer=currentPlayer%playerCount+1; const level=levels[players[currentPlayer-1].age],name=playerName(currentPlayer-1); turnEl.textContent=`${name} ritar`; ageLabel.textContent=`${name} · ${level.label}`; message.textContent=currentPlayer===playerCount?"Sedan börjar vi om från den första spelaren – alla får lika många turer!":""; showPrompt(); }
     document.querySelectorAll('[name="players"]').forEach(input=>input.addEventListener("change",renderPlayerAges));
-    document.querySelector("#start").addEventListener("click",()=>{ players=[...playerAges.querySelectorAll(".player-age")].map(row=>({name:row.querySelector("input").value,age:row.querySelector("select").value})); playerCount=players.length; saveSettings(); currentPlayer=0; setup.classList.add("hidden"); game.classList.remove("hidden"); draw(); document.querySelector("#next").focus(); });
-    document.querySelector("#next").addEventListener("click",draw);
-    document.querySelector("#skip").addEventListener("click",showPrompt);
+    document.querySelector("#start").addEventListener("click",()=>{ players=[...playerAges.querySelectorAll(".player-age")].map(row=>({name:row.querySelector("input").value,age:row.querySelector("select").value})); playerCount=players.length; saveSettings(); incrementStat("games"); currentPlayer=0; setup.classList.add("hidden"); game.classList.remove("hidden"); draw(); document.querySelector("#next").focus(); });
+    document.querySelector("#next").addEventListener("click",()=>{incrementStat("turns");draw();});
+    document.querySelector("#skip").addEventListener("click",()=>{incrementStat("skips");showPrompt();});
     document.querySelector("#back").addEventListener("click",()=>{ game.classList.add("hidden"); setup.classList.remove("hidden"); document.querySelector("#start").focus(); });
-    const saved=loadSettings(); players=Array.isArray(saved.players)?saved.players:[]; playerCount=Math.min(8,Math.max(2,Number(saved.playerCount)||2)); const playerRadio=document.querySelector(`[name="players"][value="${playerCount}"]`); if(playerRadio) playerRadio.checked=true; renderPlayerAges();
+    const saved=loadSettings(); const savedAges=Array.isArray(saved.ages)?saved.ages:Array.isArray(saved.players)?saved.players.map(player=>player.age):[]; players=savedAges.map(age=>({age})); playerCount=Math.min(8,Math.max(2,Number(saved.playerCount)||2)); saveSettings(); const playerRadio=document.querySelector(`[name="players"][value="${playerCount}"]`); if(playerRadio) playerRadio.checked=true; renderPlayerAges(); incrementStat("visits"); document.querySelector("#stats").addEventListener("toggle",event=>{if(event.currentTarget.open)updatePublicStats();});
   </script>
 </body>
 </html>
