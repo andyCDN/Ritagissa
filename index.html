@@ -53,7 +53,7 @@
   <main>
     <section class="panel" id="setup" aria-labelledby="title">
       <h1 id="title">Rita och gissa!</h1>
-      <p class="intro">Välj antal spelare, valfritt namn och ålder. Spelet ger korta, handvalda uppdrag som passar åldern.</p>
+      <p class="intro">Välj antal spelare, valfritt namn och ålder. Spelet blandar tydliga uppdrag med enkla knasigheter som bananbåt och prinsessan pruttar.</p>
       <div class="setup-grid">
         <fieldset>
           <legend>Hur många spelar?</legend>
@@ -122,6 +122,18 @@
         extras:[{word:"kaffekopp",relation:"med"},{word:"dammsugare",relation:"med"},{word:"stekpanna",relation:"med"},{word:"resväska",relation:"med"},{word:"väckarklocka",relation:"med"},{word:"tvättmaskin",relation:"i"},{word:"kundvagn",relation:"i"},{word:"taxi",relation:"i"},{word:"kontorsstol",relation:"på"},{word:"gräsklippare",relation:"på"},{word:"soffa",relation:"på"},{word:"gatlykta",relation:"under"},{word:"balkong",relation:"under"},{word:"grill",relation:"bredvid"},{word:"blomkruka",relation:"bredvid"}]
       }
     };
+    const compoundPrefixes = ["banan","glass","pizza","taco","katt","hund","kanin","grod","gris","dinosaurie","robot","spök","regnbågs","prinsess","pirat","rump","prutt","korv","pannkaks","popcorn"];
+    const compoundEndings = ["båt","fontän","bil","hus","hatt","sko","stol","säng","cykel","raket","slott","tårta","boll","paraply","ryggsäck","gitarr","kamera","telefon","krona","torn"];
+    const accessoryFigures = ["Rumpa","Banan","Glass","Pizza","Katt","Hund","Kanin","Groda","Gris","Dinosaurie","Robot","Spöke","Prinsessa","Pirat","Clown","Astronaut","Superhjälte","Kung","Drottning","Viking","Cowboy","Kock","Lärare","Apa","Pingvin"];
+    const accessories = ["solglasögon","krona","hatt","mustasch","ballong","ryggsäck","rosett","stövlar","vingar","paraply"];
+    const actionFigures = ["prinsessan","katten","hunden","kaninen","grodan","grisen","dinosaurien","roboten","spöket","piraten","clownen","astronauten","superhjälten","kungen","drottningen","vikingen","cowboyen","kocken","läraren","apan","pingvinen","bananen","glassen","pizzan","rumpan","båten","bilen","raketen","månen","solen","blomman","bollen","hatten","skon","tårtan"];
+    const sillyActions = ["pruttar","dansar","sover","hoppar","vinkar","skrattar","nyser","sjunger","snarkar","flyger"];
+    const sillyPrompts = [
+      ...compoundPrefixes.flatMap(prefix=>compoundEndings.map(ending=>`${prefix}${ending}`)),
+      ...accessoryFigures.flatMap(figure=>accessories.map(accessory=>`${figure} med ${accessory}`)),
+      ...actionFigures.flatMap(figure=>sillyActions.map(action=>`${figure[0].toUpperCase()+figure.slice(1)} ${action}`))
+    ].map(prompt=>prompt[0].toUpperCase()+prompt.slice(1));
+    const sillyPromptSet = new Set(sillyPrompts);
     const levels = Object.fromEntries(Object.entries(levelContent).map(([key,content])=>[
       key,{label:content.label,figures:[...commonFigures,...content.figures],extras:[...commonExtras,...content.extras]}
     ]));
@@ -144,8 +156,9 @@
       }));
     }
     function buildDeck(level) {
-      const prompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`));
-      if(level.figures.length!==40||level.extras.length!==30||prompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
+      const regularPrompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt=>!sillyPromptSet.has(prompt));
+      const prompts=[...regularPrompts,...sillyPrompts];
+      if(level.figures.length!==40||level.extras.length!==30||sillyPrompts.length!==1000||new Set(sillyPrompts).size!==1000||regularPrompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
       for(let i=prompts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[prompts[i],prompts[j]]=[prompts[j],prompts[i]];} return prompts;
     }
     function showPrompt() { const activeLevel=players[currentPlayer-1].age; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(levels[activeLevel]); promptEl.textContent=decks[activeLevel].pop(); }
