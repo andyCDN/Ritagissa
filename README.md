@@ -2,31 +2,44 @@
 
 Ett färgglatt, mobilanpassat rit- och gissningsspel för 2–8 spelare.
 
-På startsidan väljer gruppen antal spelare och sedan en egen åldersgrupp för varje spelare: 6–8 år, 9–12 år, 13–15 år, 15–18 år eller vuxen. Spelet visar automatiskt ett uppdrag från rätt åldersgrupp på varje spelares tur.
+## Så fungerar spelet
 
-Varje åldersgrupp har exakt 5 000 unika, konkreta uppdrag och en egen blandad kortlek. Uppdragen är gjorda för personer som inte brukar rita: varje uppdrag har bara två delar – ett välkänt huvudmotiv och en enda tydlig detalj – till exempel ”En katt med hatt”, ”Ett hus på månen” eller ”En robot med ballong”. Inga extra färger eller egenskaper behöver ritas. Streckgubbar och enkla former räcker. Ett uppdrag återkommer inte förrän samtliga 5 000 har visats.
+På startsidan väljer gruppen antal spelare. Varje spelare kan ange ett valfritt namn och välja en egen åldersgrupp: 6–8 år, 9–12 år, 13–15 år, 15–18 år eller vuxen. Valen sparas endast lokalt i webbläsaren.
 
-Öppna `index.html` direkt i en webbläsare. Spelet har inga externa beroenden, inget byggsteg och sparar inga personuppgifter.
+Varje åldersgrupp har 15 gemensamma, mycket enkla figurer samt 25 egna åldersanpassade figurer. De kombineras med 30 handvalda extrasaker. Varje extrasak har ett passande mellanled: **med**, **i**, **på**, **under** eller **bredvid**. Resultatet blir korta uppdrag som ”Katt med hatt”, ”Robot i bil” och ”Hund under paraply”. Självkombinationer som ”Katt med katt” filtreras bort.
+
+Utöver dessa finns exakt **1 000 korta knasuppdrag** som blandas in i alla kortlekar:
+
+- 400 begripliga sammansättningar, till exempel **Bananbåt** och **Glassfontän**.
+- 250 figurer med en enkel sak, till exempel **Rumpa med solglasögon**.
+- 350 figurer med en enda synlig handling, till exempel **Prinsessan pruttar**.
+
+Varje knasuppdrag innehåller högst tre ord och bygger på välkända saker eller handlingar som går att visa med enkla former.
+
+De två turknapparna beskriver både handling och resultat. Den gröna huvudknappen **Klar! Nästa spelare** avslutar turen och låter nästa person rita. Den vita alternativknappen **Byt uppdrag** byter bara kortet och låter samma spelare fortsätta. Inget uppdrag upprepas inom en åldersgrupp innan dess blandade kortlek är slut.
+
+Sidan använder en lättläst 8-bitarsstil med systemtypsnitt för brödtext, pixeltypsnitt för rubriker och knappar, avskurna pixelhörn och tydliga blockskuggor. Störande skanningslinjer och den dekorativa texten ”Pixelritkalas” är borttagna. Den har riktiga HTML-kontroller och `aria-live`. Den har inga externa beroenden, inget byggsteg och skickar inga uppgifter till en server.
+
+## Kör lokalt
+
+Öppna `index.html` direkt i en webbläsare.
+
+Kör de automatiska kontrollerna med:
+
+```bash
+node tests.mjs
+```
 
 ## Publicering
 
 Sidan kan publiceras med GitHub Pages från `main` och mappen `/(root)`.
 
-### Publicera och testa via GitHub från iPhone
-
-1. Hämta exportpaketet och öppna zip-filen i appen **Filer**.
-2. Öppna repositoryt på GitHub i Safari och välj **Add file → Upload files**.
-3. Ladda upp `index.html`, `README.md` och `CODEX_PROMPT.txt` till repositoryts rot på grenen `main`.
-4. Öppna **Settings → Pages** på GitHub.
-5. Välj **Deploy from a branch**, grenen `main` och mappen `/(root)`, och tryck på **Save**.
-6. Vänta tills GitHub visar att publiceringen är klar. Spelet finns därefter på `https://<användarnamn>.github.io/<repository>/`.
-
-Efter framtida ändringar räcker det att ersätta `index.html` på `main`. GitHub Pages publicerar då den nya versionen automatiskt. Om den gamla versionen syns på iPhone kan sidan öppnas i en privat Safari-flik för att undvika en cachad kopia.
-
 ## Testchecklista
 
-- Välj ett antal mellan 2 och 8 och starta spelet.
-- Ge spelarna olika åldersgrupper och kontrollera att rätt ålder visas på varje tur.
-- Kontrollera att spelarnumret växlar efter varje uppdrag.
-- Välj **Ändra val** och starta om med andra inställningar.
-- Prova sidan i både stående och liggande läge.
+- Välj 2–8 spelare och ange olika namn och åldrar.
+- Kontrollera att rätt namn och ålder visas på varje tur.
+- Prova mellanleden **med**, **i**, **på**, **under** och **bredvid**.
+- Tryck på **Byt uppdrag – Samma spelare fortsätter** och kontrollera att spelaren är densamma.
+- Tryck på **Klar! Nästa spelare – Nästa person får rita** och kontrollera att turen går vidare.
+- Ladda om sidan och kontrollera att grundinställningarna finns kvar.
+- Prova sidan i stående och liggande mobilformat.
