@@ -25,6 +25,9 @@
     .player-choices { grid-template-columns:repeat(4,1fr); }
     .option-choices { grid-template-columns:repeat(4,1fr); }
     .player-ages { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; }
+    .keep-awake { display:flex; align-items:center; gap:.8rem; min-height:54px; font-size:1.05rem; font-weight:850; cursor:pointer; }
+    .keep-awake input { width:28px; height:28px; accent-color:var(--green); }
+    .awake-status { min-height:1.4em; margin:.4rem 0 0; color:#5b3a87; font-size:.92rem; font-weight:750; }
     .player-age { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:.45rem .7rem; font-weight:850; }
     .player-age span { grid-row:1 / 3; }
     .player-age input, .player-age select { width:100%; min-height:46px; padding:.5rem; border:4px solid var(--ink); border-radius:0; color:var(--ink); background:#fff; box-shadow:inset 4px 4px 0 #e5dbf4; font-family:inherit; font-size:1rem; font-weight:800; }
@@ -117,6 +120,11 @@
             <label class="choice"><input type="radio" name="rounds" value="10"><span>10 varv</span></label>
           </div>
         </fieldset>
+        <fieldset>
+          <legend>Skärm</legend>
+          <label class="keep-awake"><input id="keep-awake" type="checkbox" role="switch"><span>Håll skärmen vaken under spelet</span></label>
+          <p class="awake-status" id="awake-status" aria-live="polite">Skärmen följer telefonens vanliga inställning.</p>
+        </fieldset>
       </div>
       <button class="start" id="start" type="button">▶ Starta spelet</button>
       <footer>Rita snällt, gissa fritt och hjälp varandra. ✊🌈</footer>
@@ -191,16 +199,19 @@
         extras:[{word:"kaffekopp",relation:"med"},{word:"dammsugare",relation:"med"},{word:"stekpanna",relation:"med"},{word:"resväska",relation:"med"},{word:"väckarklocka",relation:"med"},{word:"tvättmaskin",relation:"i"},{word:"kundvagn",relation:"i"},{word:"taxi",relation:"i"},{word:"kontorsstol",relation:"på"},{word:"gräsklippare",relation:"på"},{word:"soffa",relation:"på"},{word:"gatlykta",relation:"under"},{word:"balkong",relation:"under"},{word:"grill",relation:"bredvid"},{word:"blomkruka",relation:"bredvid"}]
       }
     };
-    const curatedCompounds = ["Apkrona","Ballongfisk","Bananslott","Banantelefon","Bläckfiskgitarr","Broccolimonster","Clownfisk","Dinosauriesko","Draktoffla","Elefantballong","Enhörningsbuss","Fiskcykel","Glassmonster","Glassraket","Gurkpirat","Gurkslott","Hamburgerslott","Hundhelikopter","Hundraket","Kaktusglass","Kattkrona","Kattubåt","Korvdrake","Korvrobot","Lejonparaply","Monsterkudde","Monstermössa","Muffinsberg","Mössparaply","Ostmåne","Ostspöke","Pannkakshatt","Pannkaksplanet","Pingvinraket","Piratkanin","Pizzahatt","Pizzasol","Popcornmonster","Popcornvulkan","Potatiskung","Prinsesspotatis","Raketko","Robotanka","Robotbanan","Rullskridskokatt","Smörgåståg","Snigelracerbil","Snögubbsurfare","Sockermoln","Spagettiregn","Spindelbuss","Spökryggsäck","Strumpdrake","Strumpmonster","Tandborstdrake","Toalettbil","Toalettrobot","Trollkarlskorv","Vampyrbanan","Bananbåt","Glassfontän","Bajsraket","Bananrobot","Björnbuss","Blommonster","Chokladslott","Clownraket","Drakcykel","Elefanttoffla","Fiskflygplan","Glassbil","Grodgitarr","Gurkrobot","Hamburgerhatt","Häxglass","Kattballong","Katthelikopter","Kaninkrona","Kaktusbuss","Korvslott","Lejonryggsäck","Monsterbil","Muffinstorn","Ostrobot","Pannkaksraket","Pingvinhelikopter","Piratpotatis","Pizzabåt","Popcornraket","Potatisrobot","Prinsesskorv","Robotfisk","Rullskridskohund","Smörgåsraket","Snigelbuss","Snögubbscykel","Spagettimoln","Spökbil","Strumphatt","Toalettflygplan"];
+    const curatedCompounds = ["Apkrona","Ballongfisk","Bananslott","Banantelefon","Broccolimonster","Clownfisk","Dinosauriesko","Draktoffla","Elefantballong","Enhörningsbuss","Fiskcykel","Glassmonster","Glassraket","Gurkpirat","Gurkslott","Hamburgerslott","Hundhelikopter","Hundraket","Kattkrona","Kattubåt","Korvdrake","Korvrobot","Lejonparaply","Monsterkudde","Monstermössa","Muffinsberg","Mössparaply","Ostmåne","Ostspöke","Pannkakshatt","Pingvinraket","Piratkanin","Pizzahatt","Pizzasol","Popcornmonster","Potatiskung","Prinsesspotatis","Raketko","Robotbanan","Rullskridskokatt","Snögubbsurfare","Sockermoln","Spagettiregn","Spindelbuss","Spökryggsäck","Strumpdrake","Tandborstdrake","Toalettbil","Trollkarlskorv","Bananbåt","Glassfontän","Bajsraket","Bananrobot","Björnbuss","Blommonster","Chokladslott","Clownraket","Drakcykel","Elefanttoffla","Fiskflygplan","Glassbil","Grodgitarr","Gurkrobot","Hamburgerhatt","Häxglass","Kattballong","Katthelikopter","Kaninkrona","Kaktusbuss","Korvslott","Lejonryggsäck","Monsterbil","Muffinstorn","Ostrobot","Pannkaksraket","Pingvinhelikopter","Piratpotatis","Pizzabåt","Popcornraket","Potatisrobot","Prinsesskorv","Robotfisk","Rullskridskohund","Smörgåsraket","Snigelbuss","Snögubbscykel","Spagettimoln","Spökbil","Strumphatt","Toalettflygplan"];
     const accessoryFigures = ["Rumpa","Pruttmoln","Bajskorv","Toalett","Kalsong","Näsa","Fot","Banan","Glass","Pizza","Katt","Hund","Groda","Gris","Dinosaurie","Robot","Spöke","Prinsessa","Pirat","Clown","Astronaut","Superhjälte","Kung","Apa","Pingvin"];
     const accessories = ["solglasögon","krona","hatt","mustasch","ballong","toapapper","kalsonger","stövlar","vingar","paraply"];
     const actionFigures = ["prinsessan","katten","hunden","kaninen","grodan","grisen","dinosaurien","roboten","spöket","piraten","clownen","astronauten","superhjälten","kungen","drottningen","vikingen","cowboyen","kocken","läraren","apan","pingvinen","häxan","trollkarlen","vampyren","rumpan"];
     const sillyActions = ["pruttar","rapar","dansar","tappar byxorna","åker rullskridskor","jonglerar med korvar","badar i glass","sover på pizza","sjunger i toaletten","skjuter ärtor ur näsan"];
+    const rejectedPrompts = new Set(["Prinsessa under regnbåge","Robot med spelkontroll","Bläckfiskgitarr","Toalettrobot","Robot med toapapper","Vampyr på moped","Gamer med solglasögon","Kock i kundvagn","Pannkaksplanet","Vampyrbanan","Kaktusglass","Popcornvulkan","Robotanka","Smörgåståg","Strumpmonster","Snigelracerbil","Rumpan skjuter ärtor ur näsan"]);
+    const preferredPrompts = new Set(["Katt med hatt","Elefant i tåg","Harry Potter med trollstav","Dobby på flygande kvast","Apkrona","Banantelefon","Rumpa med solglasögon","Prinsessan pruttar","Six seven","Dansande capybara","Broccolimonster","Glassmonster","Gurkpirat","Kattkrona","Ostmåne","Potatiskung","Spagettiregn","Trollkarlskorv","Enhörningsbuss","Hundhelikopter","Korvdrake","Rullskridskokatt"]);
+    const adultOnlyPrompts = new Set(["Broccolimonster"]);
     const sillyPrompts = [
       ...curatedCompounds,
       ...accessoryFigures.flatMap(figure=>accessories.map(accessory=>`${figure} med ${accessory}`)),
       ...actionFigures.flatMap(figure=>sillyActions.map(action=>`${figure[0].toUpperCase()+figure.slice(1)} ${action}`))
-    ];
+    ].filter(prompt=>!rejectedPrompts.has(prompt));
     const hardToDrawWords = ["känsla","idé","möte","budget","kris","demokrati","ekonomi"];
     function isDrawablePrompt(prompt) { const words=prompt.toLocaleLowerCase("sv-SE").split(/\s+/); return words.length<=5&&!hardToDrawWords.some(word=>words.includes(word)); }
     const modernPrompts = [
@@ -217,10 +228,17 @@
     const levels = Object.fromEntries(Object.entries(levelContent).map(([key,content])=>[
       key,{label:content.label,figures:[...commonFigures,...content.figures],extras:[...commonExtras,...content.extras]}
     ]));
-    const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), finish=document.querySelector("#finish"), promptEl=document.querySelector("#prompt"), turnName=document.querySelector("#turn-name"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages"), handover=document.querySelector("#handover"), promptWrap=document.querySelector("#prompt-wrap"), turnActions=document.querySelector("#turn-actions"), timerBox=document.querySelector("#timer-box"), timerEl=document.querySelector("#timer"), timerStart=document.querySelector("#timer-start");
-    let players=[], playerCount=2, currentPlayer=0, timerSeconds=0, maxRounds=0, completedTurns=0, timerInterval=null;
+    const decks = {}, setup=document.querySelector("#setup"), game=document.querySelector("#game"), finish=document.querySelector("#finish"), promptEl=document.querySelector("#prompt"), turnName=document.querySelector("#turn-name"), message=document.querySelector("#message"), ageLabel=document.querySelector("#age-label"), playerAges=document.querySelector("#player-ages"), handover=document.querySelector("#handover"), promptWrap=document.querySelector("#prompt-wrap"), turnActions=document.querySelector("#turn-actions"), timerBox=document.querySelector("#timer-box"), timerEl=document.querySelector("#timer"), timerStart=document.querySelector("#timer-start"), awakeToggle=document.querySelector("#keep-awake"), awakeStatus=document.querySelector("#awake-status");
+    let players=[], playerCount=2, currentPlayer=0, timerSeconds=0, maxRounds=0, completedTurns=0, timerInterval=null, keepAwake=false, wakeLock=null;
     function loadSettings() { try { return JSON.parse(localStorage.getItem("ritagissa-settings"))||{}; } catch { return {}; } }
-    function saveSettings() { localStorage.setItem("ritagissa-settings",JSON.stringify({playerCount,ages:players.map(player=>player.age),timerSeconds,maxRounds})); }
+    function saveSettings() { localStorage.setItem("ritagissa-settings",JSON.stringify({playerCount,ages:players.map(player=>player.age),timerSeconds,maxRounds,keepAwake})); }
+    async function requestWakeLock() {
+      if(!keepAwake||wakeLock||game.classList.contains("hidden"))return;
+      if(!("wakeLock" in navigator)){awakeStatus.textContent="Skärmvakning stöds inte i den här webbläsaren.";return;}
+      try{wakeLock=await navigator.wakeLock.request("screen");awakeStatus.textContent="Skärmen hålls vaken medan spelet pågår.";wakeLock.addEventListener("release",()=>{wakeLock=null;if(!keepAwake)awakeStatus.textContent="Skärmen följer telefonens vanliga inställning.";});}
+      catch{awakeStatus.textContent="Kunde inte hålla skärmen vaken. Kontrollera webbläsarens behörighet.";}
+    }
+    async function releaseWakeLock() { if(wakeLock){try{await wakeLock.release();}catch{}wakeLock=null;}awakeStatus.textContent="Skärmen följer telefonens vanliga inställning."; }
     function readCount(value) {
       if(typeof value==="number") return value;
       if(!value||typeof value!=="object") return null;
@@ -254,13 +272,14 @@
         row.append(label,name,age); return row;
       }));
     }
-    function buildDeck(level) {
-      const regularPrompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt=>!sillyPromptSet.has(prompt)&&!modernPromptSet.has(prompt));
-      const prompts=[...regularPrompts,...sillyPrompts,...modernPrompts];
-      if(level.figures.length!==40||level.extras.length!==30||sillyPrompts.length!==600||new Set(sillyPrompts).size!==600||!sillyPrompts.every(isDrawablePrompt)||modernPrompts.length!==50||modernPromptSet.size!==50||regularPrompts.length<1100||new Set(prompts).size!==prompts.length) throw new Error(`${level.label} har ogiltigt innehåll`);
-      for(let i=prompts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[prompts[i],prompts[j]]=[prompts[j],prompts[i]];} return prompts;
+    function buildDeck(levelKey) {
+      const level=levels[levelKey],regularPrompts=level.figures.flatMap(figure=>level.extras.filter(extra=>extra.word!==figure).map(extra=>`${figure[0].toUpperCase()+figure.slice(1)} ${extra.relation} ${extra.word}`)).filter(prompt=>!sillyPromptSet.has(prompt)&&!modernPromptSet.has(prompt)&&!rejectedPrompts.has(prompt));
+      const prompts=[...regularPrompts,...sillyPrompts,...modernPrompts].filter(prompt=>levelKey==="adult"||!adultOnlyPrompts.has(prompt));
+      if(level.figures.length!==40||level.extras.length!==30||curatedCompounds.length!==90||sillyPrompts.length!==588||new Set(sillyPrompts).size!==588||!sillyPrompts.every(isDrawablePrompt)||modernPrompts.length!==50||modernPromptSet.size!==50||regularPrompts.length<1095||new Set(prompts).size!==prompts.length||prompts.some(prompt=>rejectedPrompts.has(prompt))) throw new Error(`${level.label} har ogiltigt innehåll`);
+      const shuffle=list=>{for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}return list;},preferred=shuffle(prompts.filter(prompt=>preferredPrompts.has(prompt))),other=shuffle(prompts.filter(prompt=>!preferredPrompts.has(prompt)));
+      return [...other,...preferred];
     }
-    function showPrompt() { const activeLevel=players[currentPlayer-1].age; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(levels[activeLevel]); promptEl.textContent=decks[activeLevel].pop(); }
+    function showPrompt() { const activeLevel=players[currentPlayer-1].age; if(!decks[activeLevel]?.length) decks[activeLevel]=buildDeck(activeLevel); promptEl.textContent=decks[activeLevel].pop(); }
     function stopTimer() { clearInterval(timerInterval); timerInterval=null; timerStart.disabled=false; timerStart.textContent="⏱ Starta tiden"; }
     function formatTime(seconds) { return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`; }
     function resetTimer() { stopTimer(); timerEl.textContent=formatTime(timerSeconds); message.textContent=""; }
@@ -273,18 +292,20 @@
       document.querySelector("#reveal").focus();
     }
     function revealPrompt() { showPrompt(); handover.classList.add("hidden"); promptWrap.classList.remove("hidden"); turnActions.classList.remove("hidden"); if(timerSeconds){resetTimer();timerBox.classList.remove("hidden");timerStart.focus();}else document.querySelector("#next").focus(); }
-    function finishGame() { stopTimer(); game.classList.add("hidden"); finish.classList.remove("hidden"); document.querySelector("#finish-copy").textContent=`Alla fick ${maxRounds} ${maxRounds===1?"tur":"turer"}.`; document.querySelector("#restart").focus(); }
+    function finishGame() { stopTimer(); game.classList.add("hidden"); releaseWakeLock(); finish.classList.remove("hidden"); document.querySelector("#finish-copy").textContent=`Alla fick ${maxRounds} ${maxRounds===1?"tur":"turer"}.`; document.querySelector("#restart").focus(); }
     function nextTurn() { incrementStat("turns"); completedTurns+=1; if(maxRounds&&completedTurns>=playerCount*maxRounds) finishGame(); else prepareTurn(); }
-    function startGame() { players=[...playerAges.querySelectorAll(".player-age")].map(row=>({name:row.querySelector("input").value,age:row.querySelector("select").value})); playerCount=players.length; timerSeconds=Number(document.querySelector('[name="timer"]:checked').value); maxRounds=Number(document.querySelector('[name="rounds"]:checked').value); saveSettings(); incrementStat("games"); currentPlayer=0; completedTurns=0; setup.classList.add("hidden"); finish.classList.add("hidden"); game.classList.remove("hidden"); prepareTurn(); }
+    function startGame() { players=[...playerAges.querySelectorAll(".player-age")].map(row=>({name:row.querySelector("input").value,age:row.querySelector("select").value})); playerCount=players.length; timerSeconds=Number(document.querySelector('[name="timer"]:checked').value); maxRounds=Number(document.querySelector('[name="rounds"]:checked').value); keepAwake=awakeToggle.checked; saveSettings(); incrementStat("games"); currentPlayer=0; completedTurns=0; setup.classList.add("hidden"); finish.classList.add("hidden"); game.classList.remove("hidden"); requestWakeLock(); prepareTurn(); }
     document.querySelectorAll('[name="players"]').forEach(input=>input.addEventListener("change",renderPlayerAges));
     document.querySelector("#start").addEventListener("click",startGame);
     document.querySelector("#reveal").addEventListener("click",revealPrompt);
     document.querySelector("#timer-start").addEventListener("click",startTimer);
     document.querySelector("#next").addEventListener("click",nextTurn);
     document.querySelector("#skip").addEventListener("click",()=>{incrementStat("skips");resetTimer();showPrompt();});
-    document.querySelector("#back").addEventListener("click",()=>{ stopTimer(); game.classList.add("hidden"); setup.classList.remove("hidden"); document.querySelector("#start").focus(); });
+    document.querySelector("#back").addEventListener("click",()=>{ stopTimer(); game.classList.add("hidden"); releaseWakeLock(); setup.classList.remove("hidden"); document.querySelector("#start").focus(); });
     document.querySelector("#restart").addEventListener("click",startGame);
-    const saved=loadSettings(); const savedAges=Array.isArray(saved.ages)?saved.ages:Array.isArray(saved.players)?saved.players.map(player=>player.age):[]; players=savedAges.map(age=>({age})); playerCount=Math.min(8,Math.max(2,Number(saved.playerCount)||2)); timerSeconds=[0,60,90,120].includes(Number(saved.timerSeconds))?Number(saved.timerSeconds):0; maxRounds=[0,3,5,10].includes(Number(saved.maxRounds))?Number(saved.maxRounds):0; saveSettings(); const playerRadio=document.querySelector(`[name="players"][value="${playerCount}"]`),timerRadio=document.querySelector(`[name="timer"][value="${timerSeconds}"]`),roundRadio=document.querySelector(`[name="rounds"][value="${maxRounds}"]`); if(playerRadio)playerRadio.checked=true;if(timerRadio)timerRadio.checked=true;if(roundRadio)roundRadio.checked=true; renderPlayerAges(); incrementStat("visits"); document.querySelector("#stats").addEventListener("toggle",event=>{if(event.currentTarget.open)updatePublicStats();});
+    awakeToggle.addEventListener("change",()=>{keepAwake=awakeToggle.checked;saveSettings();if(keepAwake)requestWakeLock();else{releaseWakeLock();awakeStatus.textContent="Skärmen följer telefonens vanliga inställning.";}});
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&keepAwake&&!game.classList.contains("hidden")&&!wakeLock)requestWakeLock();});
+    const saved=loadSettings(); const savedAges=Array.isArray(saved.ages)?saved.ages:Array.isArray(saved.players)?saved.players.map(player=>player.age):[]; players=savedAges.map(age=>({age})); playerCount=Math.min(8,Math.max(2,Number(saved.playerCount)||2)); timerSeconds=[0,60,90,120].includes(Number(saved.timerSeconds))?Number(saved.timerSeconds):0; maxRounds=[0,3,5,10].includes(Number(saved.maxRounds))?Number(saved.maxRounds):0; keepAwake=saved.keepAwake===true;awakeToggle.checked=keepAwake;saveSettings(); const playerRadio=document.querySelector(`[name="players"][value="${playerCount}"]`),timerRadio=document.querySelector(`[name="timer"][value="${timerSeconds}"]`),roundRadio=document.querySelector(`[name="rounds"][value="${maxRounds}"]`); if(playerRadio)playerRadio.checked=true;if(timerRadio)timerRadio.checked=true;if(roundRadio)roundRadio.checked=true; renderPlayerAges(); incrementStat("visits"); document.querySelector("#stats").addEventListener("toggle",event=>{if(event.currentTarget.open)updatePublicStats();});
   </script>
 </body>
 </html>
